@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      BJS ops dashboard
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <%=stylesheet_link_tag 'bootstrap', 'common',
+    'jquery.dataTables', 'multiple-select' %>
+      <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+      queries -->
+      <!-- WARNING: Respond.js doesn't work if you view the page via file://
+      -->
+      <!--[if lt IE 9]>
+        <script src="http://cdn.bootcss.com/html5shiv/3.7.0/html5shiv.min.js">
+        </script>
+        <script src="http://cdn.bootcss.com/respond.js/1.3.0/respond.min.js">
+        </script>
+      <![endif]-->
+  </head>
+  
+  <body>
+    <%= javascript_include_tag 'jquery', 'bootstrap', 'jquery.dataTables','jquery.multiple.select' %>
+    <script type='text/javascript'>
+			Date.prototype.format = function(format) {
+        var o = {
+          "M+" : this.getMonth()+1, //month
+          "d+" : this.getDate(), //day
+          "h+" : this.getHours(), //hour
+          "m+" : this.getMinutes(), //minute
+          "s+" : this.getSeconds(), //second
+          "q+" : Math.floor((this.getMonth()+3)/3), //quarter
+          "S" : this.getMilliseconds() //millisecond
+        }
+    		if(/(y+)/.test(format))
+    		format=format.replace(RegExp.$1,(this.getFullYear()+"").substr(4 - RegExp.$1.length));
+    		for(var k in o)
+    		if(new RegExp("("+ k +")").test(format))
+    		format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+    		return format;
+      }
+
+      $(document).ready(function() {
+        var progress = setInterval(function() {
+          var $bar = $('.progress-bar');
+          if ($bar.width() == 400) {
+            clearInterval(progress);
+            $('.progress').removeClass('active');
+          } else {
+            $bar.width($bar.width() + 40);
+          }
+          $bar.text($bar.width() / 4 + "%");
+        },
+        800);
+      });
+    </script>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!--<div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">BJS ops dashboard</a>
+        </div>-->
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Productivity Audit
+                <b class="caret">
+                </b>
+              </a>
+              <ul class="dropdown-menu">
+                <li class="dropdown-header">
+                  PS
+                </li>
+                <li pa_ps__monthly>
+								<a href="/ps_productivity_audit_m">Monthly Productivity Audit</a>
+                </li>
+                <li class="divider">
+                </li>
+                <li class="dropdown-header">
+                  CS
+                </li>
+                <li pa_cs_monthly>
+                  <a href="/cs_productivity_audit_m">Monthly Productivity Audit</a>
+                </li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Cases
+                <b class="caret">
+                </b>
+              </a>
+              <ul class="dropdown-menu">
+                <li class="dropdown-header">
+                  PS
+                </li>
+                <li cases_ps_cse>
+                  <a href="#">
+                    Cases by CSE
+                  </a>
+                </li>
+                <li cases_ps_supervisior>
+                  <a href="#">
+                    Cases by Supervisior
+                  </a>
+                </li>
+                <li cases_ps_site>
+                  <a href="#">
+                    Cases by Site
+                  </a>
+                </li>
+                <li class="divider">
+                </li>
+                <li class="dropdown-header">
+                  CS
+                </li>
+                <li cases_cs_tcsa>
+                  <a href="#">
+                    Cases by TCSA
+                  </a>
+                </li>
+                <li cases_cs_supervisior>
+                  <a href="#">
+                    Cases by Supervisior
+                  </a>
+                </li>
+                <li cases_cs_site>
+                  <a href="#">
+                    Cases by Site
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                TT's
+                <b class="caret">
+                </b>
+              </a>
+              <ul class="dropdown-menu">
+                <li class="dropdown-header">
+                  PS
+                </li>
+                <li tt_ps_cse>
+                  <a href="#">
+                    TT's by cse
+                  </a>
+                </li>
+                <li tt_ps_supervisior>
+                  <a href="#">
+                    TT's by supervisior
+                  </a>
+                </li>
+                <li tt_ps_site>
+                  <a href="#">
+                    TT's by site
+                  </a>
+                </li>
+                <li class="divider">
+                </li>
+                <li class="dropdown-header">
+                  CS
+                </li>
+                <li tt_cs_tcsa>
+                  <a href="#">
+                    TT's by tcsa
+                  </a>
+                </li>
+                <li tt_cs_supervisior>
+                  <a href="#">
+                    TT's by supervisior
+                  </a>
+                </li>
+                <li tt_cs_site>
+                  <a href="#">
+                    TT's by site
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <!--/.nav-collapse -->
+      </div>
+      <!--/.container-->
+    </div>
+    <!--/.navbar-->
+    <div class="content">
+      <%= yield %>
+    </div>
+    <!-- /.content -->
+  </body>
+
+</html>

@@ -1,0 +1,47 @@
+body {
+  padding-top: 50px;
+}
+.content {
+  padding: 20px 10px;
+  text-align: center;
+}
+.page {
+	margin: 0px auto 20px auto;
+	color: #333333;
+	background: #ffffff;
+	-webkit-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
+	width: 1024px;
+	text-align: left;
+	overflow: visible;
+}
+.pageheader {
+	padding: 10px;
+	background: #f5f5f5;
+	border-bottom: 1px solid #eee;
+	margin-bottom: 15px;
+	border-top: 3px solid #585858;
+}
+.pageheader .btn-default{
+	height: 26px;
+	padding: 0 0;
+	border: 1px solid #a9a9a9;
+}
+.pagecontent {
+	padding:10px;
+	padding-bottom: 20px;
+	text-align: left;
+	overflow: auto;
+}
+.tab-content {
+	padding:10px;
+	border-top: 3px solid #585858;
+}
+.tab-content input {
+	border: 1px solid #a9a9a9;
+	border-radius: 4px;
+}
