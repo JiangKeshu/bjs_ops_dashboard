@@ -17,7 +17,8 @@ gem 'rake'
 gem 'erubis', '~> 2.7.0'
 gem 'sqlite3'
 gem 'sequel'
-gem 'mysql'
+gem 'mysql2'
+gem 'iconv'
 
 # Test requirements
 gem 'minitest', :require => 'minitest/autorun', :group => 'test'

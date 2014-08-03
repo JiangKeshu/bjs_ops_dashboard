@@ -1,0 +1,49 @@
+$(function () {
+        $('#<%= @container %>').highcharts({
+    
+            chart: {
+                type: 'column'
+            },
+    
+            title: {
+                text: '<%= @title %>'
+            },
+    
+            xAxis: {
+                categories: <%= @categories %>
+            },
+    
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<%= @ytitle %>'
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        color: 'gray'
+                    },
+                    formatter: function() {
+                        return  's'+this.stack;
+                    }
+                }
+            },
+    
+            tooltip: {
+							 formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ this.y +'('+this.percentage.toFixed(2)+'%)<br/>'+
+                        'Total: '+ this.point.stackTotal;
+                }
+            },
+    
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+    
+            series: <%= @data %>
+        });
+    });

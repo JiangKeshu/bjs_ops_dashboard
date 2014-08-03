@@ -1,0 +1,72 @@
+$(function () {
+  $('#<%= @container %>').highcharts({
+    chart: {
+      zoomType: 'xy'
+    },
+    title: {
+      text: '<%= @chart_title %>'
+    },
+    subtitle: {
+      text: '<%= @chart_subtitle %>'
+    },
+    xAxis: [{
+      categories: <%= @categories %>
+    }],
+    yAxis: [{ // Primary yAxis
+      labels: {
+        format: '',
+        style: {
+          color: Highcharts.getOptions().colors[1]
+        }
+      },
+      title: {
+        text: '<%= @pri_title %>',
+        style: {
+          color: Highcharts.getOptions().colors[1]
+        }
+      }
+    }, { // Secondary yAxis
+      title: {
+        text: '<%= @sec_title %>',
+        style: {
+          color: Highcharts.getOptions().colors[0]
+        }
+      },
+      labels: {
+        format: '',
+        style: {
+          color: Highcharts.getOptions().colors[0]
+        }
+      },
+      opposite: true
+    }],
+    tooltip: {
+      shared: true
+    },
+    legend: {
+      layout: 'vertical',
+      align: 'left',
+      x: 120,
+      verticalAlign: 'top',
+      y: 100,
+      floating: true,
+      backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+    },
+    series: [{
+      name: '<%= @column_name %>',
+      type: 'column',
+      yAxis: 1,
+      data: <%= @column_data %>,
+      tooltip: {
+          valueSuffix: ' mm'
+      }
+    }, {
+      name: 'Temperature',
+      type: '<%= spline_name %>',
+      data: <%= @spline_data %>,
+      tooltip: {
+        valueSuffix: '°C'
+      }
+    }]
+  });
+});

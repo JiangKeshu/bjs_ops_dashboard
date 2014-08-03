@@ -7,7 +7,7 @@ module BjsOpsDashboard
 		set :protection, false
 	  disable :protect_from_csrf
 		get :index do
-			redirect '/ps_productivity_audit_m'
+			redirect '/productivity_audit_m/?team=ps'
 		end
     ##
     # Caching support.

@@ -1,0 +1,181 @@
+<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
+<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' ,'highcharts' %>
+<ul id="tabs">
+	<li><a href="#" name="tab1" id="quality_tab1">Weekly Volumes</a></li>
+	<!--<li><a href="#" name="tab2" id="/olumes_tab2">Workload</a></li>
+	<li><a href="#" name="tab3" id="volumes_tab3">Opening Cases</a></li>-->
+</ul>
+<div id="tabs-content">
+	<div class="page" id="tab1">
+	  <div class="pageheader">
+	    <form role="form-tab1">
+	      <table>
+	        <tr>
+	          <td width="100%" height="100%" align="right">
+	            <table>
+								<tr>
+	                <td style="padding:5px;" align="left">
+	                  <label>Period</label>
+	                </td>
+	                <td style="padding:5px;" align="left">
+	                  <div id="daterange-tab1" class="selectbox" style="background: #fff; cursor: pointer; padding: 2px 5px; border: 1px solid #a9a9a9;border-radius: 4px;width:210px">
+	                    <i class="glyphicon glyphicon-calendar"></i>
+	                    <span></span>
+	                    <b class="caret"></b>
+	                  </div>
+	                  <!-- daterange -->
+	                </td>
+	              </tr>
+	            </table>
+	          </td>
+	          <td width="6px"></td>
+	          <td align="center" valign="center" style="border-left:1px #CCCCCC Solid;padding:10px;">
+	            <table>
+	              <tbody>
+	                <tr>
+	                  <button id="btn_viewreport-tab1" class="btn btn-success">View Report</button>
+	                </tr>
+	              </tbody>
+	            </table>
+	          </td>
+	        </tr>
+	      </table>
+	    </form>
+			<!--/.form pageheader-->
+	  </div>
+	  <!--/.pageheader -->
+		<div class="pagecontent">
+			<div class="tab-content">
+				<h2>PS case duration</h2>
+				<div id="ps_case_duration_chart"></div>
+				<h2>CS case duration</h2>
+				<div id="cs_case_duration_chart"></div>
+				<h2>PS case sla</h2>
+				<div id="ps_case_sla_chart"></div>
+				<h2>CS case sla</h2>
+				<div id="cs_case_sla_chart"></div>
+				<h2>PS TTR by Severity</h2>
+				<div id="ps_ttr_severity_chart"></div>
+				<h2>CS TTR by Severity</h2>
+				<div id="cs_ttr_severity_chart"></div>
+			</div>
+			<!--/.tab-content-->
+		</div>
+		<!--/.pagecontent-->
+	</div>
+
+</div>
+<!--tabs-content-->
+<script>
+	//var start_date = '';
+	//var end_date = '';
+	function get_start_monday(d, weeks) {
+		return new Date(d.getTime()-((weeks-1)*7+(d.getDay()||7)+6)*24*60*60*1000);
+	}
+	function get_end_saturday(d, weeks) {
+		return new Date(d.getTime()+((weeks-1)*7-(d.getDay()||7)+7)*24*60*60*1000);
+	}
+	var start_date = get_start_monday(new Date(),11);
+	var	end_date = get_end_saturday(new Date(),1);
+	var arr_user = '';
+	var data_table;
+	var data_set;
+	$(document).ready(function() {
+    $('#daterange-tab1').daterangepicker({
+      ranges: {
+        'Today': [new Date(), new Date()],
+        'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+        'Last 7 Days': [moment().subtract('days', 6), new Date()],
+        'Last 30 Days': [moment().subtract('days', 29), new Date()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+      },
+      opens: 'left',
+      format: 'YYYY-MM-DD',
+      //startDate: '2014-04-08',
+      //endDate: '2014-05-07'
+    },
+		function(start, end) {
+			start_date = new Date(start);
+			end_date = new Date(end);
+      $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+		});
+
+		function get_daterange_value(){
+			return start_date.format("dd/MM/yyyy") + ' - ' + end_date.format("dd/MM/yyyy");
+		}
+		$('#daterange-tab1 span').html(get_daterange_value());
+
+		function gen_report(){
+			gen_case_duration_chart("PS");
+			gen_case_duration_chart("CS");
+			gen_case_sla_chart("PS");
+			gen_case_sla_chart("CS");
+			gen_ttr_severity_chart("PS");
+			gen_ttr_severity_chart("CS");
+		}
+		
+		function gen_case_duration_chart(team){		
+			/*
+			var users = $('#ms_user').val();
+			if (users[0] == "multiselect-all") {
+				users.shift();
+			}
+			*/
+			$.post("/war_room_reports/get_case_duration", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team":team, "container": team.toLowerCase() + "_case_duration_chart"}, function(data, status) {
+			eval(data);
+			});
+		}
+		
+		function gen_case_sla_chart(team){		
+			$.post("/war_room_reports/get_case_sla", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team":team, "container": team.toLowerCase() + "_case_sla_chart"}, function(data, status) {
+			eval(data);
+			});
+		}
+		
+		function gen_ttr_severity_chart(team){		
+			$.post("/war_room_reports/get_ttr_severity", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team":team, "container": team.toLowerCase() + "_ttr_severity_chart"}, function(data, status) {
+			eval(data);
+			});
+		}
+
+		function get_current_month() {
+			var firstDate = new Date();
+			firstDate.setDate(1);
+			firstDate.setMonth(firstDate.getMonth() - 1);
+			var endDate = new Date(firstDate);
+			endDate.setMonth(firstDate.getMonth()+1);
+			endDate.setDate(0);
+			start_date = firstDate.format("yyyyMMdd");
+			end_date = endDate.format("yyyyMMdd");
+			return firstDate.format("dd/MM/yyyy") + ' - ' + endDate.format("dd/MM/yyyy");
+		}
+
+			
+		//$('#daterange span').html(get_current_month());
+		//$('#daterange-tab2 span').html(get_current_month());
+		$('#btn_viewreport-tab1').click(function(e){
+			e.preventDefault();
+			//console.log(data_table);
+			//data_table.fnClearTable(0);
+			gen_report();
+		});
+		
+		gen_report();		
+	});
+
+	var array_tabs_init = [1,0,0];
+	$("#volumes_tab2").click(function(){
+		if (array_tabs_init[1]==0) {
+			gen_workload_report();
+			array_tabs_init[1]=1;
+		}
+	});	
+	$("#volumes_tab3").click(function(){
+		if (array_tabs_init[2]==0) {
+			gen_opening_cases();
+			array_tabs_init[2]=1;
+		}
+	});	
+
+</script>

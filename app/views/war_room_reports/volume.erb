@@ -1,0 +1,614 @@
+<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
+<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' ,'highcharts' %>
+<ul id="tabs">
+	<li><a href="#" name="tab1" id="volumes_tab1">Weekly Volumes</a></li>
+	<li><a href="#" name="tab2" id="volumes_tab2">Workload</a></li>
+	<li><a href="#" name="tab3" id="volumes_tab3">Opening Cases</a></li>
+</ul>
+<div id="tabs-content">
+	<div class="page" id="tab1">
+	  <div class="pageheader">
+	    <form role="form-tab1">
+	      <table>
+	        <tr>
+	          <td width="100%" height="100%" align="right">
+	            <table>
+								<tr>
+									<!--
+	                <td style="padding:5px;" align="left">
+										<label valign="center">Supervisor</lable>
+									</td>
+									<td>
+										<select id="ms_supervisor" multiple="multiple" style="display: none;">
+											<% @listSupervisor.each { |supervisor| %>
+												<option value="<%= supervisor %>" selected="selected"><%= supervisor %></option>
+											<% } %>
+										</select>
+	                </td>
+	                <td style="padding:5px;" align="left">
+										<label>User</label>
+									</td>
+									<td>
+	                  <select id="ms_user" multiple="multiple">
+											<% @hashEngineer.each { |name, value| %>
+												<% value.each { |user| %>
+												<option value="<%= user%>" selected="selected"><%= user %></option>
+												<% } %>
+											<% } %>
+										</select>
+									</td>
+									-->
+	                <td style="padding:5px;" align="left">
+	                  <label>Period</label>
+	                </td>
+	                <td style="padding:5px;" align="left">
+	                  <div id="daterange" class="selectbox" style="background: #fff; cursor: pointer; padding: 2px 5px; border: 1px solid #a9a9a9;border-radius: 4px;width:210px">
+	                    <i class="glyphicon glyphicon-calendar"></i>
+	                    <span></span>
+	                    <b class="caret"></b>
+	                  </div>
+	                  <!-- daterange -->
+	                </td>
+	              </tr>
+	            </table>
+	          </td>
+	          <td width="6px"></td>
+	          <td align="center" valign="center" style="border-left:1px #CCCCCC Solid;padding:10px;">
+	            <table>
+	              <tbody>
+	                <tr>
+	                  <button id="btn_viewreport" class="btn btn-success">View Report</button>
+	                </tr>
+	              </tbody>
+	            </table>
+	          </td>
+	        </tr>
+	      </table>
+	    </form>
+			<!--/.form pageheader-->
+	  </div>
+	  <!--/.pageheader -->
+		<div class="pagecontent">
+			<div class="tab-content">
+				<div id="chart_week_crsp_by_queue_ps"></div>
+				</br>
+				<div id="chart_week_crsp_by_queue_cs"></div>
+				</br>
+				<div id="chart_week_crsp_by_type"></div>
+				</br>
+				<div id="chart_week_cases_by_status_ps"></div>
+				</br>
+				<div id="chart_week_cases_by_status_cs"></div>
+				</br>
+				<div id="chart_week_cases_by_severity_ps"></div>
+				</br>
+				<div id="chart_week_cases_by_severity_cs"></div>
+			</div>
+			<!--/.tab-content-->
+		</div>
+		<!--/.pagecontent-->
+	</div>
+	<!--page/tab2-->
+	<div class="page" id="tab2">
+	  <div class="pageheader">
+	    <form role="form-tab2">
+	      <table>
+	        <tr>
+	          <td width="100%" height="100%" align="right">
+	            <table>
+								<tr>
+	                <td style="padding:5px;" align="left">
+	                  <label>Period</label>
+	                </td>
+	                <td style="padding:5px;" align="left">
+	                  <div id="daterange-tab2" class="selectbox" style="background: #fff; cursor: pointer; padding: 2px 5px; border: 1px solid #a9a9a9;border-radius: 4px;width:210px">
+	                    <i class="glyphicon glyphicon-calendar"></i>
+	                    <span></span>
+	                    <b class="caret"></b>
+	                  </div>
+	                  <!-- daterange-tab2 -->
+	                </td>
+	              </tr>
+	            </table>
+	          </td>
+	          <td width="6px"></td>
+	          <td align="center" valign="center" style="border-left:1px #CCCCCC Solid;padding:10px;">
+	            <table>
+	              <tbody>
+	                <tr>
+	                  <button id="btn_workload" class="btn btn-success">View Report</button>
+	                </tr>
+	              </tbody>
+	            </table>
+	          </td>
+	        </tr>
+	      </table>
+	    </form>
+			<!--/.form pageheader-->
+	  </div>
+	  <!--/.pageheader -->
+		<div class="pagecontent">
+			<div class="tab-content" align="center">
+				<h2>PS Workload</h2>
+				<table id="ps_case_workload_table" class="display" cellspacing="0" width="100%"></table>
+				<h2>CS Workload</h2>
+				<table id="cs_case_workload_table" class="display" cellspacing="0" width="100%"></table>
+				</br>
+				<div id="ps_case_crsp_chart"></div>
+				</br>
+				<div id="cs_case_crsp_chart"></div>
+			</div>
+		</div>
+		<!--/.pagecontent-->
+	</div>
+	<!--page/tab2-->
+	<!--page/tab3-->
+	<div class="page" id="tab3">
+		<div class="pageheader">
+	    <table>
+	      <tr>
+	        <td width="100%" height="100%" align="right">
+	          <table>
+							<tr>
+	              <td style="padding:5px;" align="left">
+	              </td>
+	              <td style="padding:5px;" align="left">
+	              </td>
+	            </tr>
+	          </table>
+	        </td>
+	        <td width="6px"></td>
+	        <td align="center" valign="center" style="border-left:1px #CCCCCC Solid;padding:10px;">
+	          <table>
+	            <tbody>
+	              <tr>
+	                <button id="btn_opening_cases" class="btn btn-success">View Report</button>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </td>
+	      </tr>
+	    </table>
+		</div>
+	  <!--/.pageheader -->
+		<div class="pagecontent">
+			<div class="tab-content" align="center">
+				<div id="ps_opening_cases"></div>
+				<div id="cs_opening_cases"></div>
+			</div>
+		</div>
+		<!--/.pagecontent-->
+	</div>
+	<!--page/tab3-->
+
+</div>
+<!--tabs-content-->
+<script>
+	//var start_date = '';
+	//var end_date = '';
+	function get_start_monday(d, weeks) {
+		return new Date(d.getTime()-((weeks-1)*7+(d.getDay()||7)+6)*24*60*60*1000);
+	}
+	function get_end_saturday(d, weeks) {
+		return new Date(d.getTime()+((weeks-1)*7-(d.getDay()||7)+7)*24*60*60*1000);
+	}
+	var start_date = get_start_monday(new Date(),11);
+	var	end_date = get_end_saturday(new Date(),1);
+	var arr_user = '';
+	var data_table;
+	var data_set;
+	$(document).ready(function() {
+    $('#daterange').daterangepicker({
+      ranges: {
+        'Today': [new Date(), new Date()],
+        'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+        'Last 7 Days': [moment().subtract('days', 6), new Date()],
+        'Last 30 Days': [moment().subtract('days', 29), new Date()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+      },
+      opens: 'left',
+      format: 'YYYY-MM-DD',
+      //startDate: '2014-04-08',
+      //endDate: '2014-05-07'
+    },
+		function(start, end) {
+			start_date = new Date(start);
+			end_date = new Date(end);
+      $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+		});
+    $('#daterange-tab2').daterangepicker({
+      ranges: {
+        'Today': [new Date(), new Date()],
+        'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+        'Last 7 Days': [moment().subtract('days', 6), new Date()],
+        'Last 30 Days': [moment().subtract('days', 29), new Date()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+      },
+      opens: 'left',
+      format: 'YYYY-MM-DD',
+      //startDate: '2014-04-08',
+      //endDate: '2014-05-07'
+    },
+		function(start, end) {
+			start_date = new Date(start);
+			end_date = new Date(end);
+			//console.log(start_date);
+      $('#daterange-tab2 span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+		});
+		/*
+		$('#ms_supervisor').multiselect({
+			includeSelectAllOption: true,
+			buttonWidth: '180px',
+			onDropdownHide: function() {
+				var selected_supervisor = $("#ms_supervisor").val();
+				var arr_user = [];
+				var data = "<%= @jsonEngineer %>";
+				var json_user = JSON.parse(data.replace(/&quot;/g,'"'));
+				$('#ms_user').empty();
+				$('#ms_user').multiselect('rebuild');
+				if (selected_supervisor){
+					for (var i=0;i<selected_supervisor.length;i++) {
+						supervisor = selected_supervisor[i];
+						if (supervisor != "multiselect-all") {
+							arr_user = arr_user.concat(json_user[supervisor]);
+						}
+					}
+					for ( var j in arr_user) {
+						$("<option value='" + arr_user[j] +"'>" + arr_user[j] +"</option>").appendTo("#ms_user")
+					}
+					$('#ms_user').multiselect('rebuild'); 
+					$('option', $('#ms_user')).each(function(element) {
+    				$('#ms_user').multiselect('select', $(this).val());
+    			});
+				}
+      }
+		});
+		$('#ms_user').multiselect({
+			includeSelectAllOption: true,
+			buttonWidth: '180px'
+		});
+		*/
+
+		function get_daterange_value(){
+			return start_date.format("dd/MM/yyyy") + ' - ' + end_date.format("dd/MM/yyyy");
+		}
+		$('#daterange span').html(get_daterange_value());
+		$('#daterange-tab2 span').html(get_daterange_value());
+		function gen_report(){		
+			/*
+			var users = $('#ms_user').val();
+			if (users[0] == "multiselect-all") {
+				users.shift();
+			}
+			*/
+			$.post("/war_room_reports/gen_wrr_volume", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd")}, function(data, status) {
+				jsonData = JSON.parse(data);
+				//console.log(data);
+	      $('#chart_week_crsp_by_queue_ps').highcharts({
+	      	chart: {
+          	type: 'column'
+          },
+          title: {
+            text: 'Correspondences by Queue - PS'
+          },
+          xAxis: {
+						categories: jsonData.weeklyCRSPByQueuePS.categories
+          },
+          yAxis: {
+            min: 0,
+            title: {
+              text: 'number'
+            }
+          },
+          tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+						pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+								                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+          },
+          plotOptions: {
+            column: {
+              pointPadding: 0.2,
+              borderWidth: 0
+            }
+          },
+					series: jsonData.weeklyCRSPByQueuePS.series
+	      });
+	      $('#chart_week_crsp_by_queue_cs').highcharts({
+	      	chart: {
+          	type: 'column'
+          },
+          title: {
+            text: 'Weekly Correspondences by Queue - CS'
+          },
+          xAxis: {
+						categories: jsonData.weeklyCRSPByQueueCS.categories
+          },
+          yAxis: {
+            min: 0,
+            title: {
+              text: 'number'
+            }
+          },
+          tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+						pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+								                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+          },
+          plotOptions: {
+            column: {
+              pointPadding: 0.2,
+              borderWidth: 0
+            }
+          },
+					series: jsonData.weeklyCRSPByQueueCS.series
+				});
+				<!--end of chart_week_crsp_by_queue_cs-->
+				$('#chart_week_crsp_by_type').highcharts({
+          chart: {
+            type: 'column'
+          },
+          title: {
+            text: 'Correspondencs by Type'
+          },
+          xAxis: {
+            categories: jsonData.weeklyCRSPByType.categories
+          },
+          yAxis: {
+            min: 0,
+            title: {
+                text: 'Total Correspondences'
+            }
+          },
+          tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>', 
+            shared: true
+          },
+          plotOptions: {
+            column: {
+              stacking: 'normal'
+            }
+          },
+            series: jsonData.weeklyCRSPByType.series
+        });
+				<!--end chart_week_crsp_by_type-->
+				$('#chart_week_cases_by_status_ps').highcharts({
+          chart: {
+            type: 'column'
+          },
+          title: {
+            text: 'Cases by Status - PS'
+          },
+          xAxis: {
+            categories: jsonData.weeklyCasesByStatusPS.categories
+          },
+          yAxis: {
+            min: 0,
+            title: {
+                text: 'Total cases'
+            }
+          },
+          tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>', 
+            shared: true
+          },
+          plotOptions: {
+            column: {
+              stacking: 'normal'
+            }
+          },
+            series: jsonData.weeklyCasesByStatusPS.series
+				});
+				<!--end chart_week_cases_by_status_ps-->
+				$('#chart_week_cases_by_status_cs').highcharts({
+          chart: {
+            type: 'column'
+          },
+          title: {
+            text: 'Cases by Status - CS'
+          },
+          xAxis: {
+            categories: jsonData.weeklyCasesByStatusCS.categories
+          },
+          yAxis: {
+            min: 0,
+            title: {
+                text: 'Total cases'
+            }
+          },
+          tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>', 
+            shared: true
+          },
+          plotOptions: {
+            column: {
+              stacking: 'normal'
+            }
+          },
+            series: jsonData.weeklyCasesByStatusCS.series
+					});
+					<!--chart_week_cases_by_status_cs-->
+				$('#chart_week_cases_by_severity_ps').highcharts({
+          chart: {
+            type: 'column'
+          },
+          title: {
+            text: 'Cases by Severity - PS'
+          },
+          xAxis: {
+            categories: jsonData.weeklyCasesBySeverityPS.categories
+          },
+          yAxis: {
+            min: 0,
+            title: {
+                text: 'Total cases'
+            }
+          },
+          tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>', 
+            shared: true
+          },
+          plotOptions: {
+            column: {
+              stacking: 'normal'
+            }
+          },
+            series: jsonData.weeklyCasesBySeverityPS.series
+					});
+					<!--chart_week_cases_by_severity_ps-->
+				$('#chart_week_cases_by_severity_cs').highcharts({
+          chart: {
+            type: 'column'
+          },
+          title: {
+            text: 'Cases by Severity - CS'
+          },
+          xAxis: {
+            categories: jsonData.weeklyCasesBySeverityCS.categories
+          },
+          yAxis: {
+            min: 0,
+            title: {
+                text: 'Total cases'
+            }
+          },
+          tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>', 
+            shared: true
+          },
+          plotOptions: {
+            column: {
+              stacking: 'normal'
+            }
+          },
+            series: jsonData.weeklyCasesBySeverityCS.series
+					});
+					<!--chart_week_cases_by_severity_cs-->
+
+			});
+		}
+		function get_current_month() {
+			var firstDate = new Date();
+			firstDate.setDate(1);
+			firstDate.setMonth(firstDate.getMonth() - 1);
+			var endDate = new Date(firstDate);
+			endDate.setMonth(firstDate.getMonth()+1);
+			endDate.setDate(0);
+			start_date = firstDate.format("yyyyMMdd");
+			end_date = endDate.format("yyyyMMdd");
+			return firstDate.format("dd/MM/yyyy") + ' - ' + endDate.format("dd/MM/yyyy");
+		}
+
+			
+		//$('#daterange span').html(get_current_month());
+		//$('#daterange-tab2 span').html(get_current_month());
+		$('#btn_viewreport').click(function(e){
+			e.preventDefault();
+			//console.log(data_table);
+			//data_table.fnClearTable(0);
+			gen_report();
+		});
+		gen_report();		
+	});
+
+	function gen_case_crsp_chart(team){
+		$.post("/war_room_reports/gen_case_crsp_chart", {"start_date":start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team": team, "container": team.toLowerCase() + "_case_crsp_chart"}, function(data, status) {
+		eval(data)
+		});
+	}
+	function gen_workload_report(){
+		gen_ps_case_workload_report();
+		gen_cs_case_workload_report();
+		gen_case_crsp_chart("PS");
+	}
+	$('#btn_workload').click(function(e){
+		e.preventDefault();
+		//data_table.fnClearTable(0);
+		gen_workload_report();
+	});
+  function gen_ps_case_workload_report(){
+		$.post("/war_room_reports/gen_workload_report", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team": "PS"}, function(data, status) {
+		console.log(data);
+    data_set = JSON.parse(data);
+    console.log(data_set);
+    data_table = $('#ps_case_workload_table').dataTable({
+      "retrieve" : true,
+      "data" : data_set,
+			"lengthMenu" : [[25,50,100,-1],[25,50,100,"All"]],
+			"order" : [[0,"desc"]],
+			"columns" : [
+			{ "title" : "Period" },
+      { "title" : "IncomingCases" },
+      { "title" : "ClosedCases" },
+      { "title" : "Correspondences" }
+      ]
+    });
+    data_table.fnClearTable(0);
+    data_table.fnAddData(data_set);
+    data_table.fnDraw();
+  	});
+	}
+  function gen_cs_case_workload_report(){
+		$.post("/war_room_reports/gen_workload_report", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team": "CS"}, function(data, status) {
+		console.log(data);
+    data_set = JSON.parse(data);
+    console.log(data_set);
+    data_table = $('#cs_case_workload_table').dataTable({
+      "retrieve" : true,
+			"data" : data_set,
+			"lengthMenu" : [[25,50,100,-1],[25,50,100,"All"]],
+			"order" : [[0,"desc"]],
+			"columns" : [
+			{ "title" : "Period" },
+      { "title" : "IncomingCases" },
+      { "title" : "ClosedCases" },
+      { "title" : "Correspondences" }
+      ]
+    });
+    data_table.fnClearTable(0);
+    data_table.fnAddData(data_set);
+    data_table.fnDraw();
+  	});
+	}
+	function gen_opening_cases(){
+		gen_ps_opening_cases();
+		gen_cs_opening_cases();
+	}
+  function gen_ps_opening_cases(){
+		$.post("/war_room_reports/gen_opening_cases", {"team": "PS", "container" : "ps_opening_cases"}, function(data, status) {
+			eval(data);
+    });
+	}
+
+  function gen_cs_opening_cases(){
+		$.post("/war_room_reports/gen_opening_cases", {"team": "CS", "container" : "cs_opening_cases"}, function(data, status) {
+			eval(data);
+    });
+	}
+	$('#btn_opening_cases').click(function(e){
+		e.preventDefault();
+		gen_opening_cases();
+	});	
+
+	var array_tabs_init = [1,0,0];
+	$("#volumes_tab2").click(function(){
+		if (array_tabs_init[1]==0) {
+			gen_workload_report();
+			array_tabs_init[1]=1;
+		}
+	});	
+	$("#volumes_tab3").click(function(){
+		if (array_tabs_init[2]==0) {
+			gen_opening_cases();
+			array_tabs_init[2]=1;
+		}
+	});	
+
+</script>

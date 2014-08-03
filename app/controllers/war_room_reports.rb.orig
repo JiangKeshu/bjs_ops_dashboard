@@ -1,0 +1,231 @@
+require 'json'
+require 'date'
+LIB_PATH = File.dirname(__FILE__) + '../lib/'
+Dir["#{LIB_PATH}/*.rb"].each { |file| require file }
+
+
+def getWeeklyCRSPByQueue(type, startDate, endDate)
+	result = {} 
+	categories = getCategories(startDate, endDate)
+	result["categories"] = categories
+	sequel = DBConf.new
+	ds = sequel.getWeeklyCRSPByQueue( type, startDate, endDate)
+	hashCRSP = {}
+	ds.each { |r| 
+		queueName = r[:queue_name]
+		weekName = r[:week_name]
+		ct = r[:ct]
+		if hashCRSP[queueName].nil?
+			hashCRSP[queueName] = {}
+			hashCRSP[queueName] = { weekName => ct}
+		else
+			hashCRSP[queueName].merge!({weekName => ct})
+		end
+	}
+	sequel.close()
+	result["series"] = []
+	hashCRSP.each { |k,v| 
+		t = {}
+		t["name"] = k
+		t["data"] = []
+		categories.each { |week_name|
+			if !v[week_name].nil?
+				t["data"] << v[week_name]
+			else
+				t["data"] << 0
+			end
+		}
+		result["series"] << t
+	}
+	result
+end
+
+def getWeeklyCRSPByType(startDate, endDate)
+	result = {}
+	categories = getCategories(startDate, endDate)
+	result["categories"] = categories
+	sequel = DBConf.new
+	ds = sequel.getWeeklyCRSPByType(startDate, endDate)
+	hashCRSP = {}
+	ds.each { |r|
+		type = r[:type]
+		weekName = r[:week_name]
+		ct = r[:ct]
+		if hashCRSP[type].nil?
+			hashCRSP[type] = {}
+			hashCRSP[type] = { weekName => ct }
+		else
+			hashCRSP[type].merge!({weekName => ct})
+		end
+	}
+	sequel.close()
+	result["series"] = []
+	hashCRSP.each { |k,v|
+		t = {}
+		t["name"] = k
+		t["data"] = []
+		categories.each { |week_name|
+			if !v[week_name].nil?
+				t["data"] << v[week_name]
+			else
+				t["data"] << 0
+			end
+		}
+		result["series"] << t
+	}
+	result
+end
+
+def getWeeklyCasesByStatus(team, startDate, endDate)
+  result = {}
+	categories = getCategories(startDate, endDate)
+	result["categories"] = categories
+	sequel = DBConf.new
+	ds = sequel.getWeeklyCasesByStatus(team, startDate, endDate)
+	hashCRSP = {}
+	ds.each { |r|
+		status = r[:status]
+		weekName = r[:week_name]
+		ct = r[:ct]
+		if hashCRSP[status].nil?
+			hashCRSP[status] = {}
+			hashCRSP[status] = { weekName => ct }
+		else
+			hashCRSP[status].merge!({weekName => ct})
+		end
+	}
+	sequel.close()
+	result["series"] = []
+	hashCRSP.each { |k,v|
+		t = {}
+		t["name"] = k
+		t["data"] = []
+		categories.each { |week_name|
+			if !v[week_name].nil?
+				t["data"] << v[week_name]
+			else
+				t["data"] << 0
+			end
+		}
+		result["series"] << t
+	}
+	result
+
+end
+
+def getWeeklyCasesBySeverity(team, startDate, endDate)
+  result = {}
+	categories = getCategories(startDate, endDate)
+	result["categories"] = categories
+	sequel = DBConf.new
+	ds = sequel.getWeeklyCasesBySeverity(team, startDate, endDate)
+	hashCRSP = {}
+	ds.each { |r|
+		severity = r[:severity]
+		weekName = r[:week_name]
+		ct = r[:ct]
+		if hashCRSP[severity].nil?
+			hashCRSP[severity] = {}
+			hashCRSP[severity] = { weekName => ct }
+		else
+			hashCRSP[severity].merge!({weekName => ct})
+		end
+	}
+	sequel.close()
+	result["series"] = []
+	hashCRSP.each { |k,v|
+		t = {}
+		t["name"] = k
+		t["data"] = []
+		categories.each { |week_name|
+			if !v[week_name].nil?
+				t["data"] << v[week_name]
+			else
+				t["data"] << 0
+			end
+		}
+		result["series"] << t
+	}
+	result
+
+end
+
+def getCategories(startDate, endDate)
+	result = []
+	s = DateTime.parse(startDate,"%Y%m%d").strftime("%Y") + "/" + DateTime.parse(startDate,"%Y%m%d").strftime("%W")+'w'
+	e = DateTime.parse(endDate,"%Y%m%d").strftime("%Y") + "/" + DateTime.parse(endDate,"%Y%m%d").strftime("%W")+'w'
+	puts e
+	result << s
+	tmpDate = startDate
+	t = DateTime.parse(tmpDate,"%Y%m%d").strftime("%Y") + "/" + DateTime.parse(tmpDate,"%Y%m%d").strftime("%W")+'w'
+	while t != e
+		tmpDate = (DateTime.parse(tmpDate,"%Y%m%d") + 7).strftime("%Y%m%d")
+		t = DateTime.parse(tmpDate,"%Y%m%d").strftime("%Y") + "/" + DateTime.parse(tmpDate,"%Y%m%d").strftime("%W")+'w'
+		result << t
+	end
+	result
+end
+
+BjsOpsDashboard::App.controllers :war_room_reports do
+  
+  # get :index, :map => '/foo/bar' do
+  #   session[:foo] = 'bar'
+  #   render 'index'
+  # end
+
+  # get :sample, :map => '/sample/url', :provides => [:any, :js] do
+  #   case content_type
+  #     when :js then ...
+  #     else ...
+  # end
+
+  # get :foo, :with => :id do
+  #   'Maps to url '/foo/#{params[:id]}''
+  # end
+
+  # get '/example' do
+  #   'Hello world!'
+  # end
+
+  get :volume do
+		sequel = DBConf.new
+    listSupervisor = sequel.getSupervisors
+    hashEngineer = sequel.getEngineers(listSupervisor, 'ps')
+    sequel.close
+    @listSupervisor = listSupervisor
+    @hashEngineer = hashEngineer
+    @jsonEngineer = hashEngineer.to_json
+
+		render '/war_room_reports/volume', :layout => 'application'
+	end
+
+	post "/gen_wrr_volume" do
+		data = {}
+		startDate = params[:start_date]
+		endDate = params[:end_date]
+		data["weeklyCRSPByQueuePS"] = getWeeklyCRSPByQueue('PS', startDate, endDate)
+		data["weeklyCRSPByQueueCS"] = getWeeklyCRSPByQueue('CS', startDate, endDate)
+		data["weeklyCRSPByType"] = getWeeklyCRSPByType(startDate, endDate)
+		data["weeklyCasesByStatusPS"] = getWeeklyCasesByStatus('PS', startDate, endDate)
+		data["weeklyCasesByStatusCS"] = getWeeklyCasesByStatus('CS', startDate, endDate)
+		data["weeklyCasesBySeverityPS"] = getWeeklyCasesBySeverity('PS', startDate, endDate)
+		data["weeklyCasesBySeverityCS"] = getWeeklyCasesBySeverity('CS', startDate, endDate)
+
+		
+		data.to_json
+	end
+
+  get :quality do
+		render '/war_room_reports/quality', :layout => 'application'
+  end
+  get :content_management do
+		render '/war_room_reports/content_management', :layout => 'application'
+  end
+  get :hot_case do
+		render '/war_room_reports/hot_case', :layout => 'application'
+  end
+  get :forum_leads do
+		render '/war_room_reports/forum_leads', :layout => 'application'
+  end
+
+end

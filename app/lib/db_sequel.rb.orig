@@ -6,8 +6,8 @@ require 'date'
 class DBConf
 
 	def initialize
-		@DB = Sequel.connect(:adapter => 'mysql2', :user => 'jiakeshu', :host => '127.0.0.1', :database => 'aws_support_cases_bjs',:password=>'12345678')
-		#@DB.convert_invalid_date_time = nil
+		@DB = Sequel.connect('mysql://jiakeshu:12345678@127.0.0.1:3306/aws_support_cases_bjs')
+		@DB.convert_invalid_date_time = nil
 	end
 
 	def close
@@ -205,76 +205,28 @@ class DBConf
 		title = titleMapping[team]
 		#sql = "select CASE when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) >=0 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=24 then 'less than 1 day' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 24 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=48 then '1 ~ 2 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 48 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=96  then '2 ~ 4 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) is null then 'opening' else 'more than 4 days' END duration, #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by duration, period;"
 		sql = "select (CASE when timestampdiff(minute, case_start_date_utc, FIRST_OUTBOUND_DATE_UTC) - sla <=0 THEN 'meet' ELSE 'fail' END) case_sla, #{granuText} period, count(case_id) ct from d_case_details_cn c, t_acme_case_queue_type t, t_case_sla s where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and s.severity = c.severity and c.primary_email_id not like 'aws%support%@amazon.com' and primary_email_id not like 'feliwang%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by case_sla,period;"
-		puts sql
 		ds = @DB.fetch(sql)
 
 		ds
 	end
 
-	def getCaseReviewListDS(agents, startDate, endDate, team)
+	def getCaseReviewListDS(agents, startDate, endDate)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s 
 		for i in 0..agents.length - 1
 			agents[i] = "\'" + agents[i] + "\'"
 		end
 		strAgents = agents.join(",")
 
-		#sql = "select CASE_ID, CASE_DESCRIPTION, MERCHANT_CUSTOMER_ID partner_id, ALT_MERCHANT_NAME customer, CASE_STATUS_NAME,date_add(CREATION_DATE_UTC,interval 8 hour) start_date, date_add(CASE_RESOLVE_DATE_UTC,interval 8 hour) resolve_date, FIRST_HANDLING_AGENT_ID, OWNING_AGENT_LOGIN_ID, CATEGORY_NAME, CASE_TYPE_NAME from d_case_details_cn where (OWNING_AGENT_LOGIN_ID in (#{strAgents}) or (EMAIL_QUEUE_NAME in (select acme_case_queue_name from t_acme_case_queue_type where team='#{team}') and OWNING_AGENT_LOGIN_ID is null)) and primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'authmaster-bjs%@amazon.com' and primary_email_id not in ('aws-cn-dawnraid@amazon.com','cornelle+bjs@amazon.com','feliwang+1@amazon.com','nobody@amazon','karen.doughty@gmail.com','feliwang+1@amazon.com') order by case_id desc;"
-		sql = "select c.CASE_ID,c.SEVERITY, c.CASE_DESCRIPTION, c.ALT_MERCHANT_NAME customer, c.CASE_STATUS_NAME, date_format(date_add(CREATION_DATE_UTC,interval 8 hour),'%Y-%m-%d %H:%i:%s') start_date, date_format(date_add(CASE_RESOLVE_DATE_UTC,interval 8 hour),'%Y-%m-%d %H:%i:%s') resolve_date, date_format(review_date,'%Y-%m-%d %H:%i:%s') review_date, FIRST_HANDLING_AGENT_ID, c.OWNING_AGENT_LOGIN_ID, reviewer_login_id from d_case_details_cn c left join d_case_reviews r on c.case_id = r.case_id  where (c.OWNING_AGENT_LOGIN_ID in (#{strAgents}) or (EMAIL_QUEUE_NAME in (select acme_case_queue_name from t_acme_case_queue_type where team='#{team}') and c.OWNING_AGENT_LOGIN_ID is null)) and primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'authmaster-bjs%@amazon.com' and primary_email_id not in ('aws-cn-dawnraid@amazon.com','cornelle+bjs@amazon.com','feliwang+1@amazon.com','nobody@amazon','karen.doughty@gmail.com','feliwang+1@amazon.com') order by case_id desc;"
-		puts sql
+		sql = "select CASE_ID, CASE_DESCRIPTION, MERCHANT_CUSTOMER_ID partner_id, ALT_MERCHANT_NAME customer, CASE_STATUS_NAME,date_add(CASE_START_DATE_UTC,interval 8 hour) start_date, date_add(CASE_RESOLVE_DATE_UTC,interval 8 hour) resolve_date, FIRST_HANDLING_AGENT_ID, OWNING_AGENT_LOGIN_ID, CATEGORY_NAME, CASE_TYPE_NAME from d_case_details_cn where OWNING_AGENT_LOGIN_ID in (#{strAgents}) and primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'authmaster-bjs%@amazon.com' and primary_email_id not in ('aws-cn-dawnraid@amazon.com','cornelle+bjs@amazon.com','feliwang+1@amazon.com','nobody@amazon','karen.doughty@gmail.com','feliwang+1@amazon.com');"
 		ds = @DB.fetch(sql)
 
 		ds
 	end
 
-	def getCaseReviewDetailDS(caseID)
-		sql = "select r.*,c.case_status_name from d_case_reviews r, d_case_details_cn c where c.case_id=r.case_id and r.case_id=#{caseID}"
-		pp sql
-		ds = @DB.fetch(sql)
-
-		ds
-		
-	end
-	
-	def getCaseDetailDS(caseID)
-		sql = "select case_id,c.severity,OWNING_AGENT_LOGIN_ID,timestampdiff(day,case_start_date_utc,case_resolve_date_utc) ttr,ALT_MERCHANT_NAME,CASE_DESCRIPTION,(CASE when timestampdiff(minute, case_start_date_utc, FIRST_OUTBOUND_DATE_UTC) - sla <=0 THEN 'meet' ELSE 'fail' END) SLA,CASE_STATUS_NAME from d_case_details_cn c,t_case_sla s where s.severity = c.severity and c.case_id=#{caseID};"
-		pp sql
-		ds = @DB.fetch(sql)
-
-		ds
-	end
-
-	def submitReview(params)
-		column_map = {"case_id"=>"case_id","severity"=>"severity","ALT_MERCHANT_NAME"=>"customer","case_description"=>"subject","OWNING_AGENT_LOGIN_ID"=>"owner","SLA"=>"sla","TTR"=>"ttr","ir_template"=>"ir_template","timely_update"=>"timely_update","handover_template"=>"handover_template","closure_template"=>"closure_template","comments"=>"comments","courtesy"=>"courtesy","wording"=>"wording","technical_expertise"=>"technical_expertise","reviewer_login_id"=>"reviewer"}
-		if params["insert_flag"] == "1"
-			column_list = []
-			placeholder_list = []
-			value_list = []
-			column_map.each do |k,v|
-				puts k,v
-				column_list << k
-				value_list << "'"+params[v]+"'"
-			end
-			column_list << "review_date"
-			value_list << "now()"
-			sql = "insert into d_case_reviews (#{column_list.join(",")}) values (#{value_list.join(",")})"
-			insert_ds = @DB[sql]
-			insert_ds.insert
-		elsif params["insert_flag"] == "0"
-				listUpdate = []
-			column_map.each do |k,v|
-				listUpdate << k + "=" + "'"+params[v]+"'"
-			end
-			listUpdate << "review_date=now()"
-			sql = "update d_case_reviews set #{listUpdate.join(",")} where case_id=#{params["case_id"]}"
-			update_ds = @DB[sql]
-			update_ds.update
-		end
-	end
 
 	def getGranuText(granu , columnName)
 		arrayGranu = { "week" => "CONCAT(YEAR(date_add(#{columnName}, interval 8 hour)), '/', WEEK(date_add(#{columnName}, interval 8 hour),5)+1,'w')", "month" => "YEAR(date_add(#{columnName}, interval 8 hour))"}
 
 		arrayGranu[granu]	
 	end
-
 end

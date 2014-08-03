@@ -54,8 +54,12 @@
         },
         800);
       });
-    </script>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      
+      function getURLParameter(name) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+			}
+		</script>
+		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <!--<div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -71,41 +75,24 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 Productivity Audit
-                <b class="caret">
-                </b>
+                <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li class="dropdown-header">
-                  PS
-                </li>
-                <li pa_ps__monthly>
-								<a href="/ps_productivity_audit_m">Monthly Productivity Audit</a>
-                </li>
-                <li class="divider">
-                </li>
-                <li class="dropdown-header">
-                  CS
-                </li>
-                <li pa_cs_monthly>
-                  <a href="/cs_productivity_audit_m">Monthly Productivity Audit</a>
-                </li>
+                <li class="dropdown-header">PS</li>
+                <li pa_ps_monthly><a href="/productivity_audit_m/?team=ps">Monthly Productivity Audit</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">CS</li>
+                <li pa_cs_monthly><a href="/productivity_audit_m/?team=cs">Monthly Productivity Audit</a></li>
               </ul>
             </li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 Cases
-                <b class="caret">
-                </b>
+                <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li class="dropdown-header">
-                  PS
-                </li>
-                <li cases_ps_cse>
-                  <a href="#">
-                    Cases by CSE
-                  </a>
-                </li>
+                <li class="dropdown-header">PS</li>
+                <li cases_ps_cse><a href="#">Cases by CSE</a></li>
                 <li cases_ps_supervisior>
                   <a href="#">
                     Cases by Supervisior
@@ -139,53 +126,40 @@
               </ul>
             </li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                TT's
-                <b class="caret">
-                </b>
-              </a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">TT's<b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li class="dropdown-header">
-                  PS
-                </li>
-                <li tt_ps_cse>
-                  <a href="#">
-                    TT's by cse
-                  </a>
-                </li>
-                <li tt_ps_supervisior>
-                  <a href="#">
-                    TT's by supervisior
-                  </a>
-                </li>
-                <li tt_ps_site>
-                  <a href="#">
-                    TT's by site
-                  </a>
-                </li>
-                <li class="divider">
-                </li>
-                <li class="dropdown-header">
-                  CS
-                </li>
-                <li tt_cs_tcsa>
-                  <a href="#">
-                    TT's by tcsa
-                  </a>
-                </li>
-                <li tt_cs_supervisior>
-                  <a href="#">
-                    TT's by supervisior
-                  </a>
-                </li>
-                <li tt_cs_site>
-                  <a href="#">
-                    TT's by site
-                  </a>
-                </li>
+                <li class="dropdown-header">PS</li>
+                <li tt_ps_cse><a href="#">TT's by cse</a></li>
+                <li tt_ps_supervisior><a href="#">TT's by supervisior</a></li>
+                <li tt_ps_site><a href="#">TT's by site</a></li>
+                <li class="divider"></li>
+								<li class="dropdown-header">CS</li>
+                <li tt_cs_tcsa><a href="#">TT's by tcsa</a></li>
+                <li tt_cs_supervisior><a href="#">TT's by supervisior</a></li>
+                <li tt_cs_site><a href="#">TT's by site</a></li>
               </ul>
-            </li>
-          </ul>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">War Room Reports<b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li wrr_volume><a href="/war_room_reports/volume">Volume</a></li>
+								<li wrr_quality><a href="/war_room_reports/quality">Quality</a></li>
+								<li wrr_content_management><a href="/war_room_reports/content_management">Content Management</a></li>
+								<li wrr_hot_case><a href="/war_room_reports/hot_case">Hot Case</a></li>
+								<li wrr_forum_leads><a href="/war_room_reports/forum_leads">Forum Leads</a></li>
+							</ul>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Case Review<b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li class="dropdown-header">PS</li>
+								<li ps_case_review><a href="/case_review/?team=ps">Case review</a></li>
+								<li class="divider"></li>
+								<li class="dropdown-header">CS</li>
+								<li cs_case_review><a href="/case_review/?team=cs">Case review</a></li>
+							</ul>
+						</li>
+					</ul>
         </div>
         <!--/.nav-collapse -->
       </div>
@@ -195,7 +169,28 @@
     <div class="content">
       <%= yield %>
     </div>
-    <!-- /.content -->
+		<!-- /.content -->
+
+		<script type='text/javascript'>
+			$(document).ready(function() {
+				$("#tabs-content").find("[id^='tab']").hide(); // Hide all content
+				$("#tabs li:first").attr("id","current"); // Activate the first tab
+				$("#tabs-content #tab1").fadeIn(); // Show first tab's content
+				
+				$('#tabs a').click(function(e) {
+				    e.preventDefault();
+				    if ($(this).closest("li").attr("id") == "current"){ //detection for current tab
+				     return;       
+				    }
+				    else{             
+				      $("#tabs-content").find("[id^='tab']").hide(); // Hide all content
+				      $("#tabs li").attr("id",""); //Reset id's
+				      $(this).parent().attr("id","current"); // Activate this
+				      $('#' + $(this).attr('name')).fadeIn(); // Show content for the current tab
+				    }
+				});
+			});
+		</script>
   </body>
 
 </html>

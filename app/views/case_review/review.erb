@@ -1,0 +1,202 @@
+<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
+<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' %>
+<div class="page" style="width:800px;">
+  <div class="pageheader">
+		<!--/.form pageheader-->
+  </div>
+  <!--/.pageheader -->
+	<div class="pagecontent" style="width:800px;">
+		<form class="form-horizontal" role="form">
+			<div class="review_content">
+				<label id="rc_label">Case information</label>
+				<fieldset disabled>
+  			<div class="form-group">
+  			  <label for="inputCaseID" class="col-sm-2 control-label">Case ID</label>
+  			  <div class="col-sm-3">
+  			    <input type="text" class="form-control" id="inputCaseID" disabled value="<%= @hashCaseReviewDetail["caseID"]%>">
+  			  </div>
+  			  <label for="inputCaseID" class="col-sm-1 control-label"><a href='https://cscentral-cn.amazon.com/gp/stores/www.amazon.cn/gp/acme/case-management/view-case/?caseID=<%= @hashCaseReviewDetail["caseID"]%>' target='_tab'><img src=/images/yuma.png></img></a></label>
+  			  <label for="inputSeverity" class="col-sm-2 control-label">Severity</label>
+  			  <div class="col-sm-4">
+  			    <input type="text" class="form-control" id="inputSeverity" value="<%= @hashCaseReviewDetail["Severity"]%>">
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label "inputCaseOwner" class="col-sm-2 control-label">Owner</label>
+  			  <div class="col-sm-4">
+  			    <input type="text" class="form-control" id="inputCaseOwner"  value="<%= @hashCaseReviewDetail["Owner"]%>">
+  			  </div>
+  			  <label for="inputSLA" class="col-sm-2 control-label">SLA</label>
+  			  <div class="col-sm-4">
+  			    <input type="text" class="form-control" id="inputSLA" value="<%= @hashCaseReviewDetail["SLA"]%>">
+  			  </div>
+  			</div>
+				<div class="form-group">
+    			<label "inputTTR" class="col-sm-2 control-label">TTR (days)</label>
+    			<div class="col-sm-4">
+    			  <input type="text" class="form-control" id="inputTTR" value="<%= @hashCaseReviewDetail["TTR"]%>">
+    			</div>
+    			<label "inputStatus" class="col-sm-2 control-label">Status</label>
+    			<div class="col-sm-4">
+    			  <input type="text" class="form-control" id="inputStatus" value="<%= @hashCaseReviewDetail["Status"]%>">
+    			</div>
+				</div>
+  			<div class="form-group">
+  			  <label "inputCustomer" class="col-sm-2 control-label">Customer</label>
+  			  <div class="col-sm-10">
+  			    <input type="text" class="form-control" id="inputCustomer" value="<%= @hashCaseReviewDetail["Customer"]%>">
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label for="inputSubject" class="col-sm-2 control-label">Subject</label>
+  			  <div class="col-sm-10">
+  			    <input type="text" class="form-control" id="inputSubject" value="<%= @hashCaseReviewDetail["Description"]%>">
+  			  </div>
+  			</div>
+				</fieldset>
+			</div><!--review_content-->
+			<div class="review_content">
+				<label id="rc_label">Quality</label>
+  			<div class="form-group">
+  			  <label for="selectIRTemplate" class="col-sm-3 control-label">Initial Resp. template</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectIRTemplate" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["ir_template"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["ir_template"] == 1 ? "SELECTED":"" %> value="1">Yes</option>
+							<option <%= @hashCaseReviewDetail["ir_template"] == 2 ? "SELECTED":"" %> value="2">No</option>
+						</select>
+  			  </div>
+				</div>
+  			<div class="form-group">
+  			  <label "selectHandoverTempl" class="col-sm-3 control-label">Handover template</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectHandoverTempl" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["handover_template"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["handover_template"] == 1 ? "SELECTED":"" %> value="1">Yes</option>
+							<option <%= @hashCaseReviewDetail["handover_template"] == 2 ? "SELECTED":"" %> value="2">No</option>
+						</select>
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label for="selectClosureTempl" class="col-sm-3 control-label">Closure template</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectClosureTempl" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["closure_template"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["closure_template"] == 1 ? "SELECTED":"" %> value="1">Yes</option>
+							<option <%= @hashCaseReviewDetail["closure_template"] == 2 ? "SELECTED":"" %> value="2">No</option>
+						</select>
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label "selectTimelyUpdate" class="col-sm-3 control-label">Timely Update</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectTimelyUpdate" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["timely_update"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["timely_update"] == 1 ? "SELECTED":"" %> value="1">All the time</option>
+							<option <%= @hashCaseReviewDetail["timely_update"] == 2 ? "SELECTED":"" %> value="2">Most of time</option>
+							<option <%= @hashCaseReviewDetail["timely_update"] == 3 ? "SELECTED":"" %> value="3">Sometimes</option>
+							<option <%= @hashCaseReviewDetail["timely_update"] == 4 ? "SELECTED":"" %> value="4">Rare</option>
+						</select>
+  			  </div>
+				</div>
+  			<div class="form-group">
+  			  <label for="selectCourtesy" class="col-sm-3 control-label">Courtesy</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectCourtesy" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["courtesy"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["courtesy"] == 1 ? "SELECTED":"" %> value="1">Good</option>
+							<option <%= @hashCaseReviewDetail["courtesy"] == 2 ? "SELECTED":"" %> value="2">Development needed</option>
+						</select>
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label for="selectWording" class="col-sm-3 control-label">Wording</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectWording" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["wording"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["wording"] == 1 ? "SELECTED":"" %> value="1">Good</option>
+							<option <%= @hashCaseReviewDetail["wording"] == 2 ? "SELECTED":"" %> value="2">Development needed</option>
+						</select>
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label for="selectTechnicalExpertise" class="col-sm-3 control-label">Technical expertise</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectTechnicalExpertise" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["technical_expertise"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["technical_expertise"] == 1 ? "SELECTED":"" %> value="1">No gap observed</option>
+							<option <%= @hashCaseReviewDetail["technical_expertise"] == 2 ? "SELECTED":"" %> value="2">Gap observed</option>
+							<option <%= @hashCaseReviewDetail["technical_expertise"] == 2 ? "SELECTED":"" %> value="2">Immediate coaching needed</option>
+						</select>
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label for="inputReviewer" class="col-sm-3 control-label">Reviewer</label>
+  			  <div class="col-sm-4">
+  			    <select class="form-control" id="selectReviewer" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["reviewer"] == '' ? "SELECTED":"" %> value=""></option>
+							<option <%= @hashCaseReviewDetail["reviewer"] == 'feliwang' ? "SELECTED":"" %> value="feliwang">feliwang</option>
+							<option <%= @hashCaseReviewDetail["reviewer"] == 'ylaws' ? "SELECTED":"" %> value="ylaws">ylaws</option>
+							<option <%= @hashCaseReviewDetail["reviewer"] == 'jiakeshu' ? "SELECTED":"" %> value="jiakeshu">jiakeshu</option>
+							<option <%= @hashCaseReviewDetail["reviewer"] == 'wwwei' ? "SELECTED":"" %> value="wwwei">wwwei</option>
+						</select>
+  			  </div>
+					<label id="alert_reviewer" class="col-sm-4 control-label" style="color:red;text-align:left"></label>
+  			</div>
+  			<div class="form-group">
+  			  <label for="textareaComments" class="col-sm-3 control-label">Comments</label>
+  			  <div class="col-sm-9">
+						<textarea id="comments" class="form-control" rows="6"><%= @hashCaseReviewDetail["comments"]%></textarea>
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <div class="col-sm-offset-3 col-sm-2">
+  			    <button type="submit" id="btn_submit" class="btn btn-success">Submit</button>
+  			  </div>
+					<label id="submit_status" class="col-sm-3 control-label" style="color:#ADADAD;text-align:left"></label>
+					</div>
+  			</div>
+			</div><!--review_content-->
+		</form>
+  </div>
+  </div>
+		<!--/.tab-content-->
+	</div>
+	<!--/.pagecontent-->
+</div>
+<!--page-->
+<script>
+	var insert_flag;
+	$(document).ready(function() {
+		$('#selectIRTemplate').tooltip({title:'Whether used ADM template in initial response?',placement:'right'});
+		$('#selectHandoverTempl').tooltip({title:'Whether used ADM template when handover?',placement:'right'});
+		$('#selectClosureTempl').tooltip({title:'Whether used ADM template before closing the case?',placement:'right'});
+		$('#selectTimelyUpdate').tooltip({title:"Whether correspondences in the case meet SLA?",placement:'right'});
+		$('#selectCourtesy').tooltip({title:"Whether engineer replied with courtesy?",placement:'right'});
+		$('#selectWording').tooltip({title:"Whether spelling mistake in the correspondence? (Chinese and English)",placement:'right'});
+		$('#selectTechnicalExpertise').tooltip({title:"Whether engineer gave professional correspondences?",placement:'right'});
+		insert_flag="<%= @hashCaseReviewDetail["insert_flag"]%>";
+		$('#btn_submit').click(function(e){
+  	  e.preventDefault();
+			check_result = checkFields();
+			if (check_result == 0) {
+				$('#submit_status').text('Submitting...');
+		  	$.post("/case_review/submit", {"case_id":$('#inputCaseID').val(),"severity":$('#inputSeverity').val(), "owner":$('#inputCaseOwner').val(),"sla":$('#inputSLA').val(), "ttr":$('#inputTTR').val(), "customer":$('#inputCustomer').val(), "status":$('#inputStatus').val(),"subject":$('#inputSubject').val(), "ir_template":$('#selectIRTemplate').val(),"handover_template":$('#selectHandoverTempl').val(),"closure_template":$('#selectClosureTempl').val(),"timely_update":$('#selectTimelyUpdate').val(),"comments":$('#comments').val(),"courtesy":$('#selectCourtesy').val(),"wording":$('#selectWording').val(),"technical_expertise":$('#selectTechnicalExpertise').val(),"reviewer":$('#selectReviewer').val(),"insert_flag":insert_flag}, function(data, status) {
+					$('#submit_status').text(data);
+		  	});
+				insert_flag=0;
+			}
+		});
+	});
+	
+	function checkFields(){
+		result = 0;
+		if ($('#selectReviewer').val() == '') {
+			$('#alert_reviewer').text("Please choose a reviewer");
+			result = result + 1;
+		} else {
+			$('#alert_reviewer').text("");
+		}
+		return result;
+	}
+</script>

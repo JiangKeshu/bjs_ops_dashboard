@@ -1,6 +1,14 @@
 body {
   padding-top: 50px;
 }
+h2, .h2 {
+	font-size: 25px;
+	background: #f5f5f5;
+	padding: 5px;
+	font-family: 'HelveticaNeue-UltraLight', 'Helvetica Neue UltraLight', 'ralewaythin', 'Helvetica Neue', "Calibri Light", "Calibri", Helvetica, Arial, sans-serif;
+	text-align: center;
+	border-top: 3px solid #585858;
+}
 .content {
   padding: 20px 10px;
   text-align: center;
@@ -44,4 +52,122 @@ body {
 .tab-content input {
 	border: 1px solid #a9a9a9;
 	border-radius: 4px;
+}
+
+#tabs {
+  overflow: hidden;
+  width: 1024px;
+  margin: 0px auto 0px auto;
+  padding: 0;
+  list-style: none;
+}
+
+#tabs li {
+  float: left;
+  margin: 0 .5em 0 0;
+}
+
+#tabs a {
+  position: relative;
+  background: #ddd;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+  background-image: -webkit-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: -moz-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: -ms-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: -o-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: linear-gradient(to bottom, #f5f5f5, #ddd);
+  padding: .7em 3.5em;
+  float: left;
+  text-decoration: none;
+  color: #444;
+  text-shadow: 0 1px 0 rgba(255,255,255,.8);
+  -webkit-border-radius: 5px 0 0 0;
+  -moz-border-radius: 5px 0 0 0;
+  border-radius: 5px 0 0 0;
+  -moz-box-shadow: 0 2px 2px rgba(0,0,0,.2);
+  -webkit-box-shadow: 0 2px 2px rgba(0,0,0,.2);
+  box-shadow: 0 2px 2px rgba(0,0,0,.2);
+}
+
+#tabs a:hover,
+#tabs a:hover::after,
+#tabs a:focus,
+#tabs a:focus::after {
+  background: #f5f5f5;
+}
+
+#tabs a:focus {
+  outline: 0;
+}
+
+#tabs a::after {
+  content:'';
+  position:absolute;
+  z-index: 1;
+  top: 0;
+  right: -.5em;
+  bottom: 0;
+  width: 1em;
+  background: #ddd;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f5f5), to(#ddd));
+  background-image: -webkit-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: -moz-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: -ms-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: -o-linear-gradient(top, #f5f5f5, #ddd);
+  background-image: linear-gradient(to bottom, #f5f5f5, #ddd);
+  -moz-box-shadow: 2px 2px 2px rgba(0,0,0,.2);
+  -webkit-box-shadow: 2px 2px 2px rgba(0,0,0,.2);
+  box-shadow: 2px 2px 2px rgba(0,0,0,.2);
+  -webkit-transform: skew(10deg);
+  -moz-transform: skew(10deg);
+  -ms-transform: skew(10deg);
+  -o-transform: skew(10deg);
+  transform: skew(10deg);
+  -webkit-border-radius: 0 5px 0 0;
+  -moz-border-radius: 0 5px 0 0;
+  border-radius: 0 5px 0 0;
+}
+
+#tabs #current a {
+  background: #f5f5f5;
+  z-index: 3;
+}
+
+#tabs #current a::after {
+  background: #f5f5f5;
+  z-index: 3;
+}
+
+.review_content {
+	position:relative;
+	padding:45px 15px 15px;
+	margin:0 -15px 15px;
+	border-color:#e5e5e5 #eee #eee;
+	border-style:solid;
+	border-width:1px 0;
+	margin-right:0;
+	margin-left:0;
+	background-color:#fff;
+	border-color:#ddd;
+	border-width:1px;
+	border-radius:4px 4px 0 0;
+	-webkit-box-shadow:none;
+	box-shadow:none
+}
+
+#rc_label {
+	position:absolute;
+	top:15px;
+	left:15px;
+	font-size:12px;
+	font-weight:700;
+	color:#959595;
+	text-transform:uppercase;
+	letter-spacing:1px;
+}
+
+div.tooltip-inner {
+    max-width: 250px;
+		min-width: 200px;
+		text-align: left;
 }
