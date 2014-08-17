@@ -35,6 +35,11 @@ BjsOpsDashboard::App.controllers :case_review do
     render '/case_review/index', :layout => 'application'
   end
 
+	get '/report' do
+    team = params[:team].nil?? 'ps' : params[:team]
+		render '/case_review/report', :layout => 'application'
+	end
+
 	post '/list_agent_cases' do
 		agents = params[:users]
 		startDate = params[:start_date]
@@ -57,6 +62,17 @@ BjsOpsDashboard::App.controllers :case_review do
 		result = submitReview(params)	
 
 		result
+	end
+
+	post '/get_case_review_report' do
+
+		startDate = params[:start_date]
+		endDate = params[:end_date]
+		team = params[:team]
+
+		data = getCaseReviewReport(startDate, endDate, team)
+		puts data		
+		data
 	end
 
 end

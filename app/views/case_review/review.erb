@@ -68,22 +68,22 @@
   			  </div>
 				</div>
   			<div class="form-group">
+  			  <label "selectAnnotation" class="col-sm-3 control-label">Annotation</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectAnnotation" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["annotation"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["annotation"] == 1 ? "SELECTED":"" %> value="1">Good</option>
+							<option <%= @hashCaseReviewDetail["annotation"] == 2 ? "SELECTED":"" %> value="2">Development needed</option>
+						</select>
+  			  </div>
+  			</div>
+  			<div class="form-group">
   			  <label "selectHandoverTempl" class="col-sm-3 control-label">Handover template</label>
   			  <div class="col-sm-5">
   			    <select class="form-control" id="selectHandoverTempl" data-toggle="tooltip">
 							<option <%= @hashCaseReviewDetail["handover_template"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
 							<option <%= @hashCaseReviewDetail["handover_template"] == 1 ? "SELECTED":"" %> value="1">Yes</option>
 							<option <%= @hashCaseReviewDetail["handover_template"] == 2 ? "SELECTED":"" %> value="2">No</option>
-						</select>
-  			  </div>
-  			</div>
-  			<div class="form-group">
-  			  <label for="selectClosureTempl" class="col-sm-3 control-label">Closure template</label>
-  			  <div class="col-sm-5">
-  			    <select class="form-control" id="selectClosureTempl" data-toggle="tooltip">
-							<option <%= @hashCaseReviewDetail["closure_template"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
-							<option <%= @hashCaseReviewDetail["closure_template"] == 1 ? "SELECTED":"" %> value="1">Yes</option>
-							<option <%= @hashCaseReviewDetail["closure_template"] == 2 ? "SELECTED":"" %> value="2">No</option>
 						</select>
   			  </div>
   			</div>
@@ -99,6 +99,26 @@
 						</select>
   			  </div>
 				</div>
+  			<div class="form-group">
+  			  <label for="selectClosureTempl" class="col-sm-3 control-label">Closure template</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectClosureTempl" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["closure_template"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["closure_template"] == 1 ? "SELECTED":"" %> value="1">Yes</option>
+							<option <%= @hashCaseReviewDetail["closure_template"] == 2 ? "SELECTED":"" %> value="2">No</option>
+						</select>
+  			  </div>
+  			</div>
+  			<div class="form-group">
+  			  <label for="selectClosureConsent" class="col-sm-3 control-label">Closure Consent</label>
+  			  <div class="col-sm-5">
+  			    <select class="form-control" id="selectClosureConsent" data-toggle="tooltip">
+							<option <%= @hashCaseReviewDetail["closure_consent"] == 0 ? "SELECTED":"" %> value="0">N/A</option>
+							<option <%= @hashCaseReviewDetail["closure_consent"] == 1 ? "SELECTED":"" %> value="1">Yes</option>
+							<option <%= @hashCaseReviewDetail["closure_consent"] == 2 ? "SELECTED":"" %> value="2">No</option>
+						</select>
+  			  </div>
+  			</div>
   			<div class="form-group">
   			  <label for="selectCourtesy" class="col-sm-3 control-label">Courtesy</label>
   			  <div class="col-sm-5">
@@ -167,21 +187,24 @@
 <!--page-->
 <script>
 	var insert_flag;
+	var team = getURLParameter("team");
 	$(document).ready(function() {
 		$('#selectIRTemplate').tooltip({title:'Whether used ADM template in initial response?',placement:'right'});
 		$('#selectHandoverTempl').tooltip({title:'Whether used ADM template when handover?',placement:'right'});
 		$('#selectClosureTempl').tooltip({title:'Whether used ADM template before closing the case?',placement:'right'});
+		$('#selectClosureConsent').tooltip({title:'Whether engineer closed the case with customer consent or following 2-2 rule?',placement:'right'});
 		$('#selectTimelyUpdate').tooltip({title:"Whether correspondences in the case meet SLA?",placement:'right'});
 		$('#selectCourtesy').tooltip({title:"Whether engineer replied with courtesy?",placement:'right'});
 		$('#selectWording').tooltip({title:"Whether spelling mistake in the correspondence? (Chinese and English)",placement:'right'});
 		$('#selectTechnicalExpertise').tooltip({title:"Whether engineer gave professional correspondences?",placement:'right'});
+		$('#selectAnnotation').tooltip({title:"Whether engineer annotated the case as much detail as possible when needed?",placement:'right'});
 		insert_flag="<%= @hashCaseReviewDetail["insert_flag"]%>";
 		$('#btn_submit').click(function(e){
   	  e.preventDefault();
 			check_result = checkFields();
 			if (check_result == 0) {
 				$('#submit_status').text('Submitting...');
-		  	$.post("/case_review/submit", {"case_id":$('#inputCaseID').val(),"severity":$('#inputSeverity').val(), "owner":$('#inputCaseOwner').val(),"sla":$('#inputSLA').val(), "ttr":$('#inputTTR').val(), "customer":$('#inputCustomer').val(), "status":$('#inputStatus').val(),"subject":$('#inputSubject').val(), "ir_template":$('#selectIRTemplate').val(),"handover_template":$('#selectHandoverTempl').val(),"closure_template":$('#selectClosureTempl').val(),"timely_update":$('#selectTimelyUpdate').val(),"comments":$('#comments').val(),"courtesy":$('#selectCourtesy').val(),"wording":$('#selectWording').val(),"technical_expertise":$('#selectTechnicalExpertise').val(),"reviewer":$('#selectReviewer').val(),"insert_flag":insert_flag}, function(data, status) {
+		  	$.post("/case_review/submit", {"case_id":$('#inputCaseID').val(),"severity":$('#inputSeverity').val(), "owner":$('#inputCaseOwner').val(),"sla":$('#inputSLA').val(), "ttr":$('#inputTTR').val(), "customer":$('#inputCustomer').val(), "status":$('#inputStatus').val(),"subject":$('#inputSubject').val(), "ir_template":$('#selectIRTemplate').val(),"handover_template":$('#selectHandoverTempl').val(),"closure_template":$('#selectClosureTempl').val(),"timely_update":$('#selectTimelyUpdate').val(),"comments":$('#comments').val(),"courtesy":$('#selectCourtesy').val(),"wording":$('#selectWording').val(),"technical_expertise":$('#selectTechnicalExpertise').val(),"reviewer":$('#selectReviewer').val(),"annotation":$('#selectAnnotation').val(),"insert_flag":insert_flag,"closure_consent":$('#selectClosureConsent').val(),"team":team}, function(data, status) {
 					$('#submit_status').text(data);
 		  	});
 				insert_flag=0;

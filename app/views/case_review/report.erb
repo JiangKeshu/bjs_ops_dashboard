@@ -1,35 +1,13 @@
 <%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
 <%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' %>
-<div class="page">
+<div class="page" style="width:1280px;">
   <div class="pageheader">
     <form role="form">
       <table>
         <tr>
-          <td width="100%" height="100%">
+          <td width="100%" height="100%" align="right">
             <table>
               <tr>
-                <td style="padding:5px;" align="left">
-									<label valign="center">Supervisor</lable>
-								</td>
-								<td>
-									<select id="ms_supervisor" multiple="multiple" style="display: none;">
-										<% @listSupervisor.each { |supervisor| %>
-											<option value="<%= supervisor %>" selected="selected"><%= supervisor %></option>
-										<% } %>
-									</select>
-                </td>
-                <td style="padding:5px;" align="left">
-									<label>User</label>
-								</td>
-								<td>
-                  <select id="ms_user" multiple="multiple">
-										<% @hashEngineer.each { |name, value| %>
-											<% value.each { |user| %>
-											<option value="<%= user%>" selected="selected"><%= user %></option>
-											<% } %>
-										<% } %>
-									</select>
-                </td>
                 <td style="padding:5px;" align="left">
                   <label>Period</label>
                 </td>
@@ -96,74 +74,77 @@
 			console.log(start_date);
       $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
     });
-		$('#ms_supervisor').multiselect({
-			includeSelectAllOption: true,
-			buttonWidth: '180px',
-			onDropdownHide: function() {
-				var selected_supervisor = $("#ms_supervisor").val();
-				var arr_user = [];
-				var data = "<%= @jsonEngineer %>";
-				var json_user = JSON.parse(data.replace(/&quot;/g,'"'));
-				$('#ms_user').empty();
-				$('#ms_user').multiselect('rebuild');
-				if (selected_supervisor){
-					for (var i=0;i<selected_supervisor.length;i++) {
-						supervisor = selected_supervisor[i];
-						if (supervisor != "multiselect-all") {
-							arr_user = arr_user.concat(json_user[supervisor]);
-						}
-					}
-					for ( var j in arr_user) {
-						$("<option value='" + arr_user[j] +"'>" + arr_user[j] +"</option>").appendTo("#ms_user")
-					}
-					$('#ms_user').multiselect('rebuild'); 
-					$('option', $('#ms_user')).each(function(element) {
-    				$('#ms_user').multiselect('select', $(this).val());
-    			});
-				}
-      }
-		});
-		$('#ms_user').multiselect({
-			includeSelectAllOption: true,
-			buttonWidth: '180px'
-		});
-
+		function format ( d ) {
+    // `d` is the original data object for the row
+    return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+        '<tr>'+
+            '<td>Reviewer:</td>'+
+            '<td>'+d.reviewer+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Comments:</td>'+
+            '<td>'+d.comments+'</td>'+
+        '</tr>'+
+    '</table>';
+		}
 
 		function gen_report(){		
-			var users = $('#ms_user').val();
-			if (users[0] == "multiselect-all") {
-				users.shift();
-			}
 			var team = getURLParameter("team");
-			$.post("/productivity_audit_m/view_report", {"users":users, "start_date": start_date, "end_date": end_date, "team": team}, function(data, status) {
-				data_set = JSON.parse(data);
-				console.log(data_set);
-				data_table = $('#mpa').dataTable({
-					"retrieve" : true,
-					"data" : data_set,
-					"bProcessing": true,
-					"columns" : [
-						{ "title" : "Login" },
-						{ "title" : "Manager" },
-						{ "title" : "Title" },
-						{ "title" : "Tenure" },
-						{ "title" : "Cases" },
-						{ "title" : "Correspondences" },
-						{ "title" : "Chats" },
-						{ "title" : "TTs" },
-						{ "title" : "Total" },
-						{ "title" : "Threshold" }
-					]
-				});
-				data_table.fnClearTable(0);
-				data_table.fnAddData(data_set);
-				data_table.fnDraw();
+			var table = '';
+			table = $('#mpa').DataTable({
+				"bAutoWidth" : false,
+				"retrieve" : true,
+				"iDisplayLength": 100,
+				"bProcessing": true,
+				"ajax": { 
+					"url" : "/case_review/get_case_review_report",
+					"type" : "POST",
+					"data" : { "start_date" : start_date, "end_date" : end_date, "team" : team }
+				},
+				"order" : [[1,"desc"]],
+				"columns" : [
+					{
+						"class" : 'details-control',
+						"orderable" : false,
+						"data" : null,
+						"defaultContent" : ''
+					},
+					{ "title" : "CaseID" , "data" : "case_id" },
+					{ "title" : "Sev" , "data" : "severity", "sClass" : "center"},
+					{ "title" : "Score", "data" : "score", "sClass" : "center"},
+					{ "title" : "Owner", "data" : "owner" },
+					{ "title" : "IR template", "data" : "ir_template", "sClass" : "center" },
+					{ "title" : "Annotation", "data" : "annotation", "sClass" : "center" },
+					{ "title" : "Handover template", "data" : "handover_template", "sClass" : "center" },
+					{ "title" : "Timely update" , "data" : "timely_update", "sClass" : "center"},
+					{ "title" : "Closure template" , "data" : "closure_template", "sClass" : "center" },
+					{ "title" : "Closure consent" , "data" : "closure_consent", "sClass" : "center" },
+					{ "title" : "Courtesy" , "data" : "courtesy", "sClass" : "center" },
+					{ "title" : "Wording" , "data" : "wording", "sClass" : "center" },
+					{ "title" : "Technical expertise" , "data" : "technical_expertise", "sClass" : "center" }
+				]
 			});
+			$('#mpa tbody').off('click');
+			$('#mpa tbody').on('click', 'tr', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row( tr );
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
+    } );
 		}
 		function get_current_month() {
 			var firstDate = new Date();
 			firstDate.setDate(1);
-			firstDate.setMonth(firstDate.getMonth() - 1);
+			firstDate.setMonth(firstDate.getMonth() - 0);
 			var endDate = new Date(firstDate);
 			endDate.setMonth(firstDate.getMonth()+1);
 			endDate.setDate(0);
@@ -174,7 +155,6 @@
 		$('#daterange span').html(get_current_month());
 		$('#btn_viewreport').click(function(e){
 			e.preventDefault();
-			console.log(data_table);
 			//data_table.fnClearTable(0);
 			gen_report();
 		});

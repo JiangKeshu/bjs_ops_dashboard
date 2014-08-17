@@ -219,7 +219,7 @@ class DBConf
 		strAgents = agents.join(",")
 
 		#sql = "select CASE_ID, CASE_DESCRIPTION, MERCHANT_CUSTOMER_ID partner_id, ALT_MERCHANT_NAME customer, CASE_STATUS_NAME,date_add(CREATION_DATE_UTC,interval 8 hour) start_date, date_add(CASE_RESOLVE_DATE_UTC,interval 8 hour) resolve_date, FIRST_HANDLING_AGENT_ID, OWNING_AGENT_LOGIN_ID, CATEGORY_NAME, CASE_TYPE_NAME from d_case_details_cn where (OWNING_AGENT_LOGIN_ID in (#{strAgents}) or (EMAIL_QUEUE_NAME in (select acme_case_queue_name from t_acme_case_queue_type where team='#{team}') and OWNING_AGENT_LOGIN_ID is null)) and primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'authmaster-bjs%@amazon.com' and primary_email_id not in ('aws-cn-dawnraid@amazon.com','cornelle+bjs@amazon.com','feliwang+1@amazon.com','nobody@amazon','karen.doughty@gmail.com','feliwang+1@amazon.com') order by case_id desc;"
-		sql = "select c.CASE_ID,c.SEVERITY, c.CASE_DESCRIPTION, c.ALT_MERCHANT_NAME customer, c.CASE_STATUS_NAME, date_format(date_add(CREATION_DATE_UTC,interval 8 hour),'%Y-%m-%d %H:%i:%s') start_date, date_format(date_add(CASE_RESOLVE_DATE_UTC,interval 8 hour),'%Y-%m-%d %H:%i:%s') resolve_date, date_format(review_date,'%Y-%m-%d %H:%i:%s') review_date, FIRST_HANDLING_AGENT_ID, c.OWNING_AGENT_LOGIN_ID, reviewer_login_id from d_case_details_cn c left join d_case_reviews r on c.case_id = r.case_id  where (c.OWNING_AGENT_LOGIN_ID in (#{strAgents}) or (EMAIL_QUEUE_NAME in (select acme_case_queue_name from t_acme_case_queue_type where team='#{team}') and c.OWNING_AGENT_LOGIN_ID is null)) and primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'authmaster-bjs%@amazon.com' and primary_email_id not in ('aws-cn-dawnraid@amazon.com','cornelle+bjs@amazon.com','feliwang+1@amazon.com','nobody@amazon','karen.doughty@gmail.com','feliwang+1@amazon.com') order by case_id desc;"
+		sql = "select c.CASE_ID,c.SEVERITY, c.CASE_DESCRIPTION, c.ALT_MERCHANT_NAME customer, c.CASE_STATUS_NAME, date_format(date_add(CREATION_DATE_UTC,interval 8 hour),'%Y-%m-%d %H:%i:%s') start_date, date_format(date_add(CASE_RESOLVE_DATE_UTC,interval 8 hour),'%Y-%m-%d %H:%i:%s') resolve_date, date_format(review_date,'%Y-%m-%d %H:%i:%s') review_date, FIRST_HANDLING_AGENT_ID, c.OWNING_AGENT_LOGIN_ID, reviewer_login_id from d_case_details_cn c left join d_case_reviews r on c.case_id = r.case_id  where (c.OWNING_AGENT_LOGIN_ID in (#{strAgents}) or (EMAIL_QUEUE_NAME in (select acme_case_queue_name from t_acme_case_queue_type where team='#{team}') and c.OWNING_AGENT_LOGIN_ID is null)) and primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'authmaster-bjs%@amazon.com' and primary_email_id not in ('aws-cn-dawnraid@amazon.com','cornelle+bjs@amazon.com','feliwang+1@amazon.com','nobody@amazon','karen.doughty@gmail.com','feliwang+1@amazon.com') and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') order by case_id desc;"
 		puts sql
 		ds = @DB.fetch(sql)
 
@@ -234,6 +234,12 @@ class DBConf
 		ds
 		
 	end
+
+	def getCaseReviewReportDS(team)
+		sql = "select case_id, severity, ir_template,annotation,handover_template,timely_update, closure_template,closure_template, courtesy, wording, technical_expertise,comments,owning_agent_login_id,reviewer_login_id,closure_consent from d_case_reviews where team='#{team}';"
+
+		ds = @DB.fetch(sql)
+	end
 	
 	def getCaseDetailDS(caseID)
 		sql = "select case_id,c.severity,OWNING_AGENT_LOGIN_ID,timestampdiff(day,case_start_date_utc,case_resolve_date_utc) ttr,ALT_MERCHANT_NAME,CASE_DESCRIPTION,(CASE when timestampdiff(minute, case_start_date_utc, FIRST_OUTBOUND_DATE_UTC) - sla <=0 THEN 'meet' ELSE 'fail' END) SLA,CASE_STATUS_NAME from d_case_details_cn c,t_case_sla s where s.severity = c.severity and c.case_id=#{caseID};"
@@ -244,7 +250,7 @@ class DBConf
 	end
 
 	def submitReview(params)
-		column_map = {"case_id"=>"case_id","severity"=>"severity","ALT_MERCHANT_NAME"=>"customer","case_description"=>"subject","OWNING_AGENT_LOGIN_ID"=>"owner","SLA"=>"sla","TTR"=>"ttr","ir_template"=>"ir_template","timely_update"=>"timely_update","handover_template"=>"handover_template","closure_template"=>"closure_template","comments"=>"comments","courtesy"=>"courtesy","wording"=>"wording","technical_expertise"=>"technical_expertise","reviewer_login_id"=>"reviewer"}
+		column_map = {"case_id"=>"case_id","severity"=>"severity","ALT_MERCHANT_NAME"=>"customer","case_description"=>"subject","OWNING_AGENT_LOGIN_ID"=>"owner","SLA"=>"sla","TTR"=>"ttr","ir_template"=>"ir_template","timely_update"=>"timely_update","handover_template"=>"handover_template","closure_template"=>"closure_template","comments"=>"comments","courtesy"=>"courtesy","wording"=>"wording","technical_expertise"=>"technical_expertise","reviewer_login_id"=>"reviewer","annotation"=>"annotation","closure_consent"=>"closure_consent","team"=>"team"}
 		if params["insert_flag"] == "1"
 			column_list = []
 			placeholder_list = []
@@ -252,20 +258,22 @@ class DBConf
 			column_map.each do |k,v|
 				puts k,v
 				column_list << k
-				value_list << "'"+params[v]+"'"
+				value_list << "'"+params[v].gsub(/'/,"''")+"'"
 			end
 			column_list << "review_date"
 			value_list << "now()"
 			sql = "insert into d_case_reviews (#{column_list.join(",")}) values (#{value_list.join(",")})"
+			puts sql
 			insert_ds = @DB[sql]
 			insert_ds.insert
 		elsif params["insert_flag"] == "0"
 				listUpdate = []
 			column_map.each do |k,v|
-				listUpdate << k + "=" + "'"+params[v]+"'"
+				listUpdate << k + "=" + "'"+params[v].gsub(/'/,"''")+"'"
 			end
 			listUpdate << "review_date=now()"
 			sql = "update d_case_reviews set #{listUpdate.join(",")} where case_id=#{params["case_id"]}"
+			puts sql
 			update_ds = @DB[sql]
 			update_ds.update
 		end
