@@ -31,6 +31,15 @@
 									</select>
                 </td>
                 <td style="padding:5px;" align="left">
+                  <label>Case Status</label>
+                </td>
+								<td>
+                  <select id="ms_case_status">
+											<option value="0" selected="selected">Resolved</option>
+											<option value="1">All</option>
+									</select>
+								</td>
+                <td style="padding:5px;" align="left">
                   <label>Period</label>
                 </td>
                 <td style="padding:5px;" align="left">
@@ -128,7 +137,9 @@
 			buttonWidth: '180px'
 		});
 
-
+		$('#ms_case_status').multiselect({
+			buttonWidth: '120px'
+		});
 		function gen_report(){		
 			var users = $('#ms_user').val();
 			if (users == null) {
@@ -138,7 +149,7 @@
 				users.shift();
 			}
 			var team = getURLParameter("team");
-			$.post("/case_review/list_agent_cases", {"users":users, "start_date": start_date, "end_date": end_date, "team": team}, function(data, status) {
+			$.post("/case_review/list_agent_cases", {"users":users, "start_date": start_date, "end_date": end_date, "team": team, "ms_case_status": $('#ms_case_status').val()}, function(data, status) {
 				data_set = JSON.parse(data);
 				console.log(data_set);
 				data_table = $('#mpa').dataTable({

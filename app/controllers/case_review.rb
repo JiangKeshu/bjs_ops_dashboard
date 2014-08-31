@@ -45,8 +45,10 @@ BjsOpsDashboard::App.controllers :case_review do
 		startDate = params[:start_date]
 		endDate = params[:end_date]
 		team = params[:team]
-		
-		data = getCaseReviewList(agents, startDate, endDate, team)
+		#ms_case_status
+		#0=resolved;1=all
+		ms_case_status = params[:ms_case_status]
+		data = getCaseReviewList(agents, startDate, endDate, team, ms_case_status)
 
 		data
 	end

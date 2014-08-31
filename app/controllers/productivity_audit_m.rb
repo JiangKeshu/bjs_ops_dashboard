@@ -49,26 +49,28 @@ BjsOpsDashboard::App.controllers :productivity_audit_m do
 		}
 		arrayReportData = []
 		arrayAgents.each { |r|
+			t = {}
 			user_login = r["Login"]
+			tt_statistic =sequel.getTTCount(user_login, startDate, endDate)
 			user_url = "<a href='agent_report?agent=#{user_login}'>#{user_login}</a>"
-			r["Login"] = user_url
-			r["Cases"] = sequel.getAgentCaseCountDS(user_login, startDate, endDate)
-			r["Correspondences"] = sequel.getAgentCorrespondenceCount(user_login, startDate, endDate)
-			r["Chats"] = sequel.getChatCount(user_login, startDate, endDate)
-			r["TTs"] = sequel.getTTCount(user_login, startDate, endDate)
-			r["Total"] = r["Correspondences"] + r["Chats"] + r["TTs"]
-			r["Threshold"] = 128
-			#r["ttCount"] = sequel.getTTCount(r["agent"], startDate, endDate)
-			arrayTmp = []
-			r.each { |k,v|
-				arrayTmp << v
+			t["login"] = user_url
+			t["cases"] = sequel.getAgentCaseCountDS(user_login, startDate, endDate)
+			t["correspondences"] = sequel.getAgentCorrespondenceCount(user_login, startDate, endDate)
+			t["chats"] = sequel.getChatCount(user_login, startDate, endDate)
+			t["tt_correspondences"] = tt_statistic["tt_crsp"]
+			t["total"] = t["correspondences"] + t["chats"] + t["tt_correspondences"]
+			t["threshold"] = 128
+			t["manager"] = r["Manager"]
+			t["title"] = r["Title"]
+			t["tenure"] = r["Tenure"]			
+			t["tt_count"] = tt_statistic["tt_count"]
+			arrayReportData << t
 			}
-			arrayReportData << arrayTmp
-		}
-		jsonReportData = arrayReportData.to_json
+		hashReportData = {}
+		hashReportData["data"] = arrayReportData
 		sequel.close
 		#puts jsonReportData
-		jsonReportData
+		hashReportData.to_json
   end
 
 

@@ -1,6 +1,6 @@
 <%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
 <%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' %>
-<div class="page">
+<div class="page" style="width:1280px;">
   <div class="pageheader">
     <form role="form">
       <table>
@@ -93,8 +93,7 @@
 		function(start, end) {
 			start_date = start.format('YYYYMMDD');
 			end_date = end.format('YYYYMMDD');
-			console.log(start_date);
-      $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+    	$('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
     });
 		$('#ms_supervisor').multiselect({
 			includeSelectAllOption: true,
@@ -135,29 +134,31 @@
 				users.shift();
 			}
 			var team = getURLParameter("team");
-			$.post("/productivity_audit_m/view_report", {"users":users, "start_date": start_date, "end_date": end_date, "team": team}, function(data, status) {
-				data_set = JSON.parse(data);
-				console.log(data_set);
-				data_table = $('#mpa').dataTable({
-					"retrieve" : true,
-					"data" : data_set,
-					"bProcessing": true,
-					"columns" : [
-						{ "title" : "Login" },
-						{ "title" : "Manager" },
-						{ "title" : "Title" },
-						{ "title" : "Tenure" },
-						{ "title" : "Cases" },
-						{ "title" : "Correspondences" },
-						{ "title" : "Chats" },
-						{ "title" : "TTs" },
-						{ "title" : "Total" },
-						{ "title" : "Threshold" }
-					]
-				});
-				data_table.fnClearTable(0);
-				data_table.fnAddData(data_set);
-				data_table.fnDraw();
+			if (data_table != null){
+				data_table.destroy();
+			}
+			data_table = $('#mpa').DataTable({
+				"retrieve" : true,
+				"data" : data_set,
+				"bProcessing": true,
+				"ajax": {
+					"url": "/productivity_audit_m/view_report",
+					"type": "POST",
+					"data": {"users":users, "start_date": start_date, "end_date": end_date, "team": team}
+				},
+				"columns" : [
+					{ "title" : "Login" , "data": "login"},
+					{ "title" : "Manager", "data": "manager" },
+					{ "title" : "Title", "data": "title" },
+					{ "title" : "Tenure", "data": "tenure" },
+					{ "title" : "Cases", "data": "cases" },
+					{ "title" : "TTs", "data": "tt_count" },
+					{ "title" : "Correspondences", "data": "correspondences" },
+					{ "title" : "Chats", "data": "chats" },
+					{ "title" : "TT Correspondences", "data": "tt_correspondences" },
+					{ "title" : "Total", "data": "total" },
+					{ "title" : "Threshold", "data": "threshold" }
+				]
 			});
 		}
 		function get_current_month() {
@@ -174,7 +175,6 @@
 		$('#daterange span').html(get_current_month());
 		$('#btn_viewreport').click(function(e){
 			e.preventDefault();
-			console.log(data_table);
 			//data_table.fnClearTable(0);
 			gen_report();
 		});

@@ -7,11 +7,11 @@ require 'pp'
 LIB_PATH = File.dirname(__FILE__) + '../lib/'
 Dir["#{LIB_PATH}/*.rb"].each { |file| require file }
 
-def getCaseReviewList(agents, startDate, endDate, team)
+def getCaseReviewList(agents, startDate, endDate, team, ms_case_status)
 
 	result = []
 	sequel = DBConf.new
-	ds = sequel.getCaseReviewListDS(agents, startDate, endDate, team)
+	ds = sequel.getCaseReviewListDS(agents, startDate, endDate, team, ms_case_status)
 
 	ds.each do |r|
 		t = []	
@@ -45,7 +45,7 @@ def getCaseReviewReport(startDate, endDate, team)
 		score = 0
 		t["case_id"] = "<a href='/case_review/review/?caseID=#{r[:case_id]}&team=#{team}' target='_Blank'>#{r[:case_id]}</a>&nbsp;&nbsp;<a href='https://cscentral-cn.amazon.com/gp/stores/www.amazon.cn/gp/acme/case-management/view-case/?caseID=#{r[:case_id]}' target='_Blank'><img src='/images/yuma.png'></img></a>"
 		t["severity"] = r[:severity]
-		t["owner"] = r[:owning_agent_login_id]
+		t["review_date"] = r[:review_date]
 		hashScoreItems.each do |item|
 			if !r[item.to_sym].nil?
 				t[item] = hashOptionsMap[item][r[item.to_sym].to_s]['option']
@@ -58,11 +58,13 @@ def getCaseReviewReport(startDate, endDate, team)
 		t["comments"] = r[:comments].gsub(/\n/,'<br/>')
 		t["reviewer"] = r[:reviewer_login_id]
 		t["score"] = score
+		t["highlight_flag"] = r[:highlight_flag]
 		data << t	
 	end
 		
 	result["data"] = data	
 	sequel.close()
+	puts result.to_json
 	result.to_json
 end
 
@@ -71,7 +73,6 @@ def getCaseReviewDetail(caseID)
 	caseReviewDetail = {}
 	sequel = DBConf.new
 	ds = sequel.getCaseReviewDetailDS(caseID)
-	puts ds.count
 	if ds.count != 0
 		ds.each do |r|
 			caseReviewDetail["caseID"] = r[:case_id]
@@ -94,6 +95,7 @@ def getCaseReviewDetail(caseID)
 			caseReviewDetail["technical_expertise"] = r[:technical_expertise]
 			caseReviewDetail["reviewer"] = r[:reviewer_login_id]
 			caseReviewDetail["comments"] = r[:comments]
+			caseReviewDetail["highlight_flag"] = r[:highlight_flag]
 			caseReviewDetail["insert_flag"] = 0
 		end
 	else
@@ -119,12 +121,13 @@ def getCaseReviewDetail(caseID)
 			caseReviewDetail["reviewer"] = ''
 			caseReviewDetail["technical_expertise"] = 0
 			caseReviewDetail["comments"] = ""
+			caseReviewDetail["highlight_flag"] = "false"
 			caseReviewDetail["insert_flag"] = 1
 		end
 	end
 
 	sequel.close()
-	
+
 	caseReviewDetail
 end
 

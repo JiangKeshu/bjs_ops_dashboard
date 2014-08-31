@@ -1,5 +1,5 @@
-<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect', 'icheck_flat_red' %>
-<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify', 'icheck' %>
+<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
+<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' %>
 <div class="page" style="width:800px;">
   <div class="pageheader">
 		<!--/.form pageheader-->
@@ -163,16 +163,6 @@
   			  </div>
 					<label id="alert_reviewer" class="col-sm-4 control-label" style="color:red;text-align:left"></label>
   			</div>
-				<div class="form-group">
-  			  <label class="col-sm-3 control-label">Highlight</label>
-					<div class="col-sm-4">
-						<div class="checkbox" style="padding-left:0px;">
-							<label>
-								<input type="checkbox" id="checkboxHighlight" <%= @hashCaseReviewDetail["highlight_flag"] == 'true' ? "checked":"" %>>
-							</label>
-						</div>
-					</div>
-				</div>
   			<div class="form-group">
   			  <label for="textareaComments" class="col-sm-3 control-label">Comments</label>
   			  <div class="col-sm-9">
@@ -209,16 +199,12 @@
 		$('#selectTechnicalExpertise').tooltip({title:"Whether engineer gave professional correspondences?",placement:'right'});
 		$('#selectAnnotation').tooltip({title:"PS: Quality of engineer's correspondences and annotations",placement:'right'});
 		insert_flag="<%= @hashCaseReviewDetail["insert_flag"]%>";
-		$('input').iCheck({
-			checkboxClass: 'icheckbox_flat-red',
-			radioClass: 'iradio_flat-red'
-		});
 		$('#btn_submit').click(function(e){
   	  e.preventDefault();
 			check_result = checkFields();
 			if (check_result == 0) {
 				$('#submit_status').text('Submitting...');
-		  	$.post("/case_review/submit", {"case_id":$('#inputCaseID').val(),"severity":$('#inputSeverity').val(), "owner":$('#inputCaseOwner').val(),"sla":$('#inputSLA').val(), "ttr":$('#inputTTR').val(), "customer":$('#inputCustomer').val(), "status":$('#inputStatus').val(),"subject":$('#inputSubject').val(), "ir_template":$('#selectIRTemplate').val(),"handover_template":$('#selectHandoverTempl').val(),"closure_template":$('#selectClosureTempl').val(),"timely_update":$('#selectTimelyUpdate').val(),"comments":$('#comments').val(),"courtesy":$('#selectCourtesy').val(),"wording":$('#selectWording').val(),"technical_expertise":$('#selectTechnicalExpertise').val(),"reviewer":$('#selectReviewer').val(),"annotation":$('#selectAnnotation').val(),"insert_flag":insert_flag,"closure_consent":$('#selectClosureConsent').val(), "highlight_flag":$('#checkboxHighlight').is(':checked'),"team":team}, function(data, status) {
+		  	$.post("/case_review/submit", {"case_id":$('#inputCaseID').val(),"severity":$('#inputSeverity').val(), "owner":$('#inputCaseOwner').val(),"sla":$('#inputSLA').val(), "ttr":$('#inputTTR').val(), "customer":$('#inputCustomer').val(), "status":$('#inputStatus').val(),"subject":$('#inputSubject').val(), "ir_template":$('#selectIRTemplate').val(),"handover_template":$('#selectHandoverTempl').val(),"closure_template":$('#selectClosureTempl').val(),"timely_update":$('#selectTimelyUpdate').val(),"comments":$('#comments').val(),"courtesy":$('#selectCourtesy').val(),"wording":$('#selectWording').val(),"technical_expertise":$('#selectTechnicalExpertise').val(),"reviewer":$('#selectReviewer').val(),"annotation":$('#selectAnnotation').val(),"insert_flag":insert_flag,"closure_consent":$('#selectClosureConsent').val(),"team":team}, function(data, status) {
 					$('#submit_status').text(data);
 		  	});
 				insert_flag=0;
