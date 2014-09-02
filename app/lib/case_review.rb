@@ -30,6 +30,7 @@ def getCaseReviewList(agents, startDate, endDate, team, ms_case_status)
 	end
 
 	sequel.close()
+	puts result.to_json
 	result.to_json
 end
 

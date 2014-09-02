@@ -1,4 +1,4 @@
-<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
+<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables.smallfont', 'bootstrap-multiselect' %>
 <%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' %>
 <div class="page" style="width:1280px;">
   <div class="pageheader">
@@ -159,7 +159,7 @@
 					"data" : data_set,
 					"order" : [[0,"desc"]],
 					"aoColumns" : [
-						{ "title" : "CaseID" },
+						{ "title" : "CaseID", "sWidth" : "70px" },
 						{ "title" : "Sev" , "sClass" : "center"},
 						{ "title" : "Description"},
 						{ "title" : "Customer" },
@@ -177,18 +177,18 @@
 				data_table.fnDraw();
 			});
 		}
-		function get_current_month() {
+		function get_date_range(offset) {
 			var firstDate = new Date();
-			firstDate.setDate(1);
-			firstDate.setMonth(firstDate.getMonth() - 0);
-			var endDate = new Date(firstDate);
-			endDate.setMonth(firstDate.getMonth()+1);
-			endDate.setDate(0);
+			var endDate = new Date();
+			//firstDate.setDate(1);
+			firstDate.setMonth(firstDate.getMonth() - offset);
+			//endDate.setMonth(firstDate.getMonth()+1);
+			//endDate.setDate(0);
 			start_date = firstDate.format("yyyyMMdd");
 			end_date = endDate.format("yyyyMMdd");
 			return firstDate.format("dd/MM/yyyy") + ' - ' + endDate.format("dd/MM/yyyy");
 		}
-		$('#daterange span').html(get_current_month());
+		$('#daterange span').html(get_date_range(2));
 		$('#btn_viewreport').click(function(e){
 			e.preventDefault();
 			console.log(data_table);

@@ -45,10 +45,18 @@
 	  <!--/.pageheader -->
 		<div class="pagecontent">
 			<div class="tab-content">
+				<h2>PS case duration</h2>
+				<div id="ps_case_duration_chart"></div>
+				<h2>CS case duration</h2>
+				<div id="cs_case_duration_chart"></div>
 				<h2>PS case sla</h2>
 				<div id="ps_case_sla_chart"></div>
 				<h2>CS case sla</h2>
 				<div id="cs_case_sla_chart"></div>
+				<h2>PS TTR by Severity</h2>
+				<div id="ps_ttr_severity_chart"></div>
+				<h2>CS TTR by Severity</h2>
+				<div id="cs_ttr_severity_chart"></div>
 			</div>
 			<!--/.tab-content-->
 		</div>
@@ -145,26 +153,7 @@
 		function(start, end) {
 			start_date = new Date(start);
 			end_date = new Date(end);
-      $('#daterange-tab1 span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
-		});
-    $('#daterange-tab2').daterangepicker({
-      ranges: {
-        'Today': [new Date(), new Date()],
-        'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
-        'Last 7 Days': [moment().subtract('days', 6), new Date()],
-        'Last 30 Days': [moment().subtract('days', 29), new Date()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
-      },
-      opens: 'left',
-      format: 'YYYY-MM-DD',
-      //startDate: '2014-04-08',
-      //endDate: '2014-05-07'
-    },
-		function(start, end) {
-			start_date = new Date(start);
-			end_date = new Date(end);
-      $('#daterange-tab2 span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+      $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
 		});
 
 		function get_daterange_value(){
@@ -172,17 +161,11 @@
 		}
 		$('#daterange-tab1 span').html(get_daterange_value());
 
-		function gen_sla_report(){
-			//gen_case_duration_chart("PS");
-			//gen_case_duration_chart("CS");
-			gen_case_sla_chart("PS");
-			gen_case_sla_chart("CS");
-			//gen_ttr_severity_chart("PS");
-			//gen_ttr_severity_chart("CS");
-		}
-		function gen_ttr_report(){
+		function gen_report(){
 			gen_case_duration_chart("PS");
 			gen_case_duration_chart("CS");
+			gen_case_sla_chart("PS");
+			gen_case_sla_chart("CS");
 			gen_ttr_severity_chart("PS");
 			gen_ttr_severity_chart("CS");
 		}
@@ -230,25 +213,24 @@
 			e.preventDefault();
 			//console.log(data_table);
 			//data_table.fnClearTable(0);
-			gen_sla_report();
+			gen_report();
 		});
 		
-		gen_sla_report();		
-
-		var array_tabs_init = [1,0,0];
-		$("#quality_tab2").click(function(){
-			if (array_tabs_init[1]==0) {
-				gen_ttr_report();
-				array_tabs_init[1]=1;
-			}
-		});	
-		$("#quality_tab3").click(function(){
-			if (array_tabs_init[2]==0) {
-				gen_opening_cases();
-				array_tabs_init[2]=1;
-			}
-		});	
+		gen_report();		
 	});
 
+	var array_tabs_init = [1,0,0];
+	$("#quality_tab2").click(function(){
+		if (array_tabs_init[1]==0) {
+			gen_ttr_report();
+			array_tabs_init[1]=1;
+		}
+	});	
+	$("#quality_tab3").click(function(){
+		if (array_tabs_init[2]==0) {
+			gen_opening_cases();
+			array_tabs_init[2]=1;
+		}
+	});	
 
 </script>
