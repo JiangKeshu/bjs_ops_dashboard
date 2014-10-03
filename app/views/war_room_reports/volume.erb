@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
-<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' ,'highcharts' %>
+<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' ,'highcharts', 'exporting' %>
 <ul id="tabs">
 	<li><a href="#" name="tab1" id="volumes_tab1">Weekly Volumes</a></li>
 	<li><a href="#" name="tab2" id="volumes_tab2">Workload</a></li>
@@ -316,6 +316,16 @@
               borderWidth: 0
             }
           },
+					navigation: {
+						buttonOptions: {
+							theme: {
+								style: {
+									//color: '#039',
+									//textDecoration: 'underline'
+								}
+							}
+						}
+					},
 					series: jsonData.weeklyCRSPByQueuePS.series
 	      });
 	      $('#chart_week_crsp_by_queue_cs').highcharts({
@@ -404,7 +414,32 @@
               stacking: 'normal'
             }
           },
-            series: jsonData.weeklyCasesByStatusPS.series
+          series: jsonData.weeklyCasesByStatusPS.series,
+					exporting: {
+						buttons: {
+							contextButton: {
+								enabled: false
+							},
+							customButton: {
+								text: 'Raw data',
+								symbol: 'menu',
+								//symbolStroke: '#333333',
+								height: 50,
+                onclick: function () {
+                  window.open('/rawdata/?view=week_cases_by_status&team=ps&start_date='+start_date.format('yyyyMMdd')+'&end_date='+end_date.format('yyyyMMdd'), '_blank');
+                },
+								theme: {
+									padding: 3,
+									stroke: '#585858',
+									states: {
+										hover: {
+											fill: '#f5f5f5'
+										}
+									}
+								}
+              }
+						}
+					}
 				});
 				<!--end chart_week_cases_by_status_ps-->
 				$('#chart_week_cases_by_status_cs').highcharts({
@@ -432,8 +467,33 @@
               stacking: 'normal'
             }
           },
-            series: jsonData.weeklyCasesByStatusCS.series
-					});
+          series: jsonData.weeklyCasesByStatusCS.series,
+					exporting: {
+						buttons: {
+							contextButton: {
+								enabled: false
+							},
+							customButton: {
+								text: 'Raw data',
+								symbol: 'menu',
+								//symbolStroke: '#333333',
+								height: 50,
+                onclick: function () {
+                  window.open('/rawdata/?view=week_cases_by_status&team=cs&start_date='+start_date.format('yyyyMMdd')+'&end_date='+end_date.format('yyyyMMdd'), '_blank');
+                },
+								theme: {
+									padding: 3,
+									stroke: '#585858',
+									states: {
+										hover: {
+											fill: '#f5f5f5'
+										}
+									}
+								}
+              }
+						}
+					}
+				});
 					<!--chart_week_cases_by_status_cs-->
 				$('#chart_week_cases_by_severity_ps').highcharts({
           chart: {
@@ -460,8 +520,8 @@
               stacking: 'normal'
             }
           },
-            series: jsonData.weeklyCasesBySeverityPS.series
-					});
+          series: jsonData.weeklyCasesBySeverityPS.series
+				});
 					<!--chart_week_cases_by_severity_ps-->
 				$('#chart_week_cases_by_severity_cs').highcharts({
           chart: {
@@ -582,13 +642,13 @@
 		gen_cs_opening_cases();
 	}
   function gen_ps_opening_cases(){
-		$.post("/war_room_reports/gen_opening_cases", {"team": "PS", "container" : "ps_opening_cases"}, function(data, status) {
+		$.post("/war_room_reports/gen_opening_cases", {"team": "PS", "container" : "opening_cases"}, function(data, status) {
 			eval(data);
     });
 	}
 
   function gen_cs_opening_cases(){
-		$.post("/war_room_reports/gen_opening_cases", {"team": "CS", "container" : "cs_opening_cases"}, function(data, status) {
+		$.post("/war_room_reports/gen_opening_cases", {"team": "CS", "container" : "opening_cases"}, function(data, status) {
 			eval(data);
     });
 	}

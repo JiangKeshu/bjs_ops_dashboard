@@ -291,4 +291,18 @@ class DBConf
 		arrayGranu[granu]	
 	end
 
+	def get_rawdata_ds(params)
+		start_date = params[:start_date]
+		end_date = params[:end_date]
+		team = params[:team]
+		sql_map = { 
+			"week_cases_by_status" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1,'w') period, CASE_STATUS_NAME status, c.case_id  from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CREATION_DATE_UTC, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(CREATION_DATE_UTC, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') order by 1 desc;",
+			"opening_cases" => "select case_status_name status,case_id from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and case_status_name <> 'Resolved';"
+		}
+		sql = sql_map[params[:view]]
+		ds = @DB.fetch(sql)
+
+		ds
+	end
+
 end

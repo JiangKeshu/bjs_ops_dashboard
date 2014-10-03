@@ -50,6 +50,7 @@ $(function () {
 			  return '<b>'+ this.point.name +'</b>: '+ this.y+'('+ Highcharts.numberFormat(this.percentage, 1) +'%)';
 			}
 		},
+		<%= @rawdata %>
     series: [{
       name: '<%= @innerName %>',
       data: innerData,

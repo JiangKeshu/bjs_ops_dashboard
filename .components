@@ -1,0 +1,9 @@
+---
+:orm: sequel
+:test: minitest
+:mock: none
+:script: jquery
+:renderer: erb
+:stylesheet: none
+:namespace: BjsOpsDashboard
+:migration_format: number

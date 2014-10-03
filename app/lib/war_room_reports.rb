@@ -223,13 +223,42 @@ def getOpeningCases(team, chartContainer)
 		lData << hData
 		count = count + 1
 	end
+
+	str_exporting = %Q[
+          exporting: {
+            buttons: {
+              contextButton: {
+                enabled: false
+              },
+              customButton: {
+                text: 'Raw data',
+                symbol: 'menu',
+                //symbolStroke: '#333333',
+                height: 50,
+                onclick: function () {
+									window.open('/rawdata/?view=#{chartContainer}&team=#{team}&start_date=&end_date=','_blank');
+                },
+                theme: {
+                  padding: 3,
+                  stroke: '#585858',
+                  states: {
+                    hover: {
+                      fill: '#f5f5f5'
+                    }
+                  }
+                }
+              }
+            }
+          },
+	]
 	assigns[:data] = lData.to_json
-	assigns[:container] = chartContainer
+	assigns[:container] = team.downcase+"_"+chartContainer
 	assigns[:title] = "#{team}"
 	assigns[:ytitle] = "ytitle"
 	assigns[:innerName] = "Status"
 	assigns[:outerName] = "Queue"
 	assigns[:totalNum] = totalNum
+	assigns[:rawdata] = str_exporting
 	assigns
 end
 

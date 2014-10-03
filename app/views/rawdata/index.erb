@@ -1,0 +1,44 @@
+<%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect', 'icheck_flat_red' %>
+<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify', 'icheck' %>
+<div class="page" style="width:800px;">
+  <div class="pageheader">
+		<!--/.form pageheader-->
+  </div>
+  <!--/.pageheader -->
+	<div class="pagecontent" style="width:800px;">
+		<div class="tab-content">
+			<form class="form-horizontal" role="form">
+				<h2>Rawdata [<%= @rawdata_datatable_header %>]</h2>
+				<table id="mpa" class="display" cellspacing="0" width="100%"></table>
+			</form>
+		</div>
+		<!--./tab-content-->
+	</div>
+	<!--/.pagecontent-->
+</div>
+<!--page-->
+<script>
+	var view = getURLParameter("view");
+	var team = getURLParameter("team");
+	var start_date = getURLParameter("start_date");
+	var end_date = getURLParameter("end_date");
+	$(document).ready(function() {
+		function gen_report(){
+			var table = '';
+      table = $('#mpa').DataTable({
+        "bAutoWidth" : false,
+        "retrieve" : true,
+        "iDisplayLength": 100,
+        "bProcessing": true,
+        "ajax": {
+          "url" : "/rawdata/show_rawdata",
+          "type" : "POST",
+          "data" : { "view": view, "start_date" : start_date, "end_date" : end_date, "team" : team }
+        },
+        "order" : [[0,"desc"],[1,"desc"]],
+        "aoColumns" : <%= @rawdata_datatable_json.html_safe %>
+      });
+    }
+		gen_report();
+	});
+</script>
