@@ -104,6 +104,7 @@ BjsOpsDashboard::App.controllers :war_room_reports do
 		template = File.new(TEMPLATE_PATH + "stacked_column.erb").read
 
 		strJS = template.eruby(assigns)
+		puts strJS
 		strJS		
 	end
 

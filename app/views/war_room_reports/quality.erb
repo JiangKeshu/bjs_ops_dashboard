@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'daterangepicker-bs3', 'jquery.dataTables', 'bootstrap-multiselect' %>
-<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' ,'highcharts' %>
+<%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' ,'highcharts', 'exporting' %>
 <ul id="tabs">
 	<li><a href="#" name="tab1" id="quality_tab1">SLA</a></li>
 	<li><a href="#" name="tab2" id="quality_tab2">TTR</a></li>
@@ -200,7 +200,7 @@
 		}
 		
 		function gen_case_sla_chart(team){		
-			$.post("/war_room_reports/get_case_sla", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team":team, "container": team.toLowerCase() + "_case_sla_chart"}, function(data, status) {
+			$.post("/war_room_reports/get_case_sla", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team":team, "container": "case_sla_chart"}, function(data, status) {
 			eval(data);
 			});
 		}

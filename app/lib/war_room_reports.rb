@@ -224,33 +224,7 @@ def getOpeningCases(team, chartContainer)
 		count = count + 1
 	end
 
-	str_exporting = %Q[
-          exporting: {
-            buttons: {
-              contextButton: {
-                enabled: false
-              },
-              customButton: {
-                text: 'Raw data',
-                symbol: 'menu',
-                //symbolStroke: '#333333',
-                height: 50,
-                onclick: function () {
-									window.open('/rawdata/?view=#{chartContainer}&team=#{team}&start_date=&end_date=','_blank');
-                },
-                theme: {
-                  padding: 3,
-                  stroke: '#585858',
-                  states: {
-                    hover: {
-                      fill: '#f5f5f5'
-                    }
-                  }
-                }
-              }
-            }
-          },
-	]
+	str_exporting = genChartRawdataString(chartContainer, team, '', '')
 	assigns[:data] = lData.to_json
 	assigns[:container] = team.downcase+"_"+chartContainer
 	assigns[:title] = "#{team}"
@@ -323,10 +297,11 @@ def getCaseSLAChart(team, startDate, endDate, container, granu)
 		hashTmp["data"] = listValue
 		data << hashTmp
 	end
-
+	puts "getCaseSLAChart: container=" + container + " , team=" + team
+  assigns[:rawdata] = genChartRawdataString(container, team, startDate, endDate)
 	assigns[:data] = data.to_json
 	assigns[:categories] = categories.to_json	
-	assigns[:container] = container	
+	assigns[:container] = team.downcase + "_" + container	
 	assigns
 end
 

@@ -14,7 +14,8 @@ class RawdataUtil
 	def initialize 
 		@datatable_json_map = {
 			'week_cases_by_status' => { 'datatable' => [{'title'=>'Period','data'=>'period'},{'title'=>'Status','data'=>'status'},{'title'=>'Case ID','data'=>'case_id'}], 'header' => 'Cases by status'},
-			'opening_cases' => { 'datatable' => [{'title'=>'Status','data'=>'status'},{'title'=>'Case ID','data'=>'case_id'}], 'header' => 'Opening cases'}
+			'opening_cases' => { 'datatable' => [{'title'=>'Status','data'=>'status'},{'title'=>'Case ID','data'=>'case_id'}], 'header' => 'Opening cases'},
+			'case_sla_chart' => { 'datatable' => [{'title'=>'Period','data'=>'period'},{'title'=>'Case ID','data'=>'case_id'},{'title'=>'SLA','data'=>'case_sla'}], 'header' => 'Case SLA'}
      
 		}
 	end

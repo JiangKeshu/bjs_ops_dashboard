@@ -297,9 +297,11 @@ class DBConf
 		team = params[:team]
 		sql_map = { 
 			"week_cases_by_status" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1,'w') period, CASE_STATUS_NAME status, c.case_id  from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CREATION_DATE_UTC, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(CREATION_DATE_UTC, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') order by 1 desc;",
-			"opening_cases" => "select case_status_name status,case_id from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and case_status_name <> 'Resolved';"
+			"opening_cases" => "select case_status_name status,case_id from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and case_status_name <> 'Resolved';",
+			"case_sla_chart" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1,'w') period, (CASE when timestampdiff(minute, case_start_date_utc, FIRST_OUTBOUND_DATE_UTC) - sla <=0 THEN 'meet' ELSE 'fail' END) case_sla, case_id from d_case_details_cn c, t_acme_case_queue_type t, t_case_sla s where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and s.severity = c.severity and c.primary_email_id not like 'aws%support%@amazon.com' and primary_email_id not like 'feliwang%@amazon.com' and primary_email_id <>'jiannian@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') having case_sla='fail';"
 		}
 		sql = sql_map[params[:view]]
+		pp sql
 		ds = @DB.fetch(sql)
 
 		ds
