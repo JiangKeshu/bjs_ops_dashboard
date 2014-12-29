@@ -384,12 +384,11 @@ def getCategories(startDate, endDate)
 	result = []
 	s = DateTime.parse(startDate,"%Y%m%d").strftime("%Y") + "/" + (DateTime.parse(startDate,"%Y%m%d").strftime("%W").to_i+1).to_s+'w'
 	e = DateTime.parse(endDate,"%Y%m%d").strftime("%Y") + "/" + (DateTime.parse(endDate,"%Y%m%d").strftime("%W").to_i+1).to_s+'w'
-	result << s
 	tmpDate = startDate
 	t = DateTime.parse(tmpDate,"%Y%m%d").strftime("%Y") + "/" + (DateTime.parse(tmpDate,"%Y%m%d").strftime("%W").to_i+1).to_s+'w'
-	while t != e
-		tmpDate = (DateTime.parse(tmpDate,"%Y%m%d") + 7).strftime("%Y%m%d")
+	while tmpDate <= endDate
 		t = DateTime.parse(tmpDate,"%Y%m%d").strftime("%Y") + "/" + (DateTime.parse(tmpDate,"%Y%m%d").strftime("%W").to_i+1).to_s+'w'
+		tmpDate = (DateTime.parse(tmpDate,"%Y%m%d") + 7).strftime("%Y%m%d")
 		result << t
 	end
 	result
