@@ -6,12 +6,14 @@ require 'date'
 class DBConf
 
 	def initialize
-		@DB = Sequel.connect(:adapter => 'mysql2', :user => 'jiakeshu', :host => '127.0.0.1', :database => 'aws_support_cases_bjs',:password=>'12345678')
+		@DB = Sequel.connect(:adapter => 'mysql2', :user => 'jiakeshu', :host => '127.0.0.1', :database => 'aws_support_cases_bjs', :password=>'12345678')
+		@TTDB = Sequel.connect(:adapter => 'mysql2', :user => 'support', :host => '127.0.0.1', :database => 'aws_support_remedy_bjs', :password=>'bjssupport')
 		#@DB.convert_invalid_date_time = nil
 	end
 
 	def close
 		@DB.disconnect
+		@TTDB.disconnect
 	end
 
 	def getEngineers(listSupervisor, role)
@@ -93,15 +95,22 @@ class DBConf
 	def getTTCount(login, startDate, endDate)
 		result = {}
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
-		sql = "select count(*) tt_crsp,count(distinct(case_id)) tt_count from o_remedy_audittrail_cn where created_by='#{login}' and date_add(creat_date, interval 8 hour)>='#{startDate}' and date_add(creat_date, interval 8 hour)<'#{endDate}'"
-		ds = @DB.fetch(sql)
+
+		sql = "select count(distinct(tt_id)) tt_count from tickets where tt_ower='#{login}' and date_add(create_datetime, interval 8 hour)>='#{startDate}' and date_add(create_datetime, interval 8 hour)<'#{endDate}'"
+		ds = @TTDB.fetch(sql)
 		ds.each { |r|
-			result["tt_crsp"] = r[:tt_crsp]
 			result["tt_count"] = r[:tt_count]
 		}
+
+		sql = "select count(distinct(c_id)) tt_correspondences from correspondences where c_ower='#{login}' and date_add(create_datetime, interval 8 hour)>='#{startDate}' and date_add(create_datetime, interval 8 hour)<'#{endDate}'"
+		ds = @TTDB.fetch(sql)
+		ds.each { |r|
+			result["tt_correspondences"] = r[:tt_correspondences]
+		}
+
 		result
 	end
-	
+
 	def getWeeklyCRSPByQueue(type, startDate, endDate)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 		sql = {};
