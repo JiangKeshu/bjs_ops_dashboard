@@ -57,12 +57,12 @@ BjsOpsDashboard::App.controllers :productivity_audit_m do
 			t["cases"] = sequel.getAgentCaseCountDS(user_login, startDate, endDate)
 			t["correspondences"] = sequel.getAgentCorrespondenceCount(user_login, startDate, endDate)
 			t["chats"] = sequel.getChatCount(user_login, startDate, endDate)
-			t["tt_correspondences"] = tt_statistic["tt_crsp"]
+			t["tt_correspondences"] = tt_statistic["tt_correspondences"]
 			t["total"] = t["correspondences"] + t["chats"] + t["tt_correspondences"]
 			t["threshold"] = 128
 			t["manager"] = r["Manager"]
 			t["title"] = r["Title"]
-			t["tenure"] = r["Tenure"]			
+			t["tenure"] = r["Tenure"]
 			t["tt_count"] = tt_statistic["tt_count"]
 			arrayReportData << t
 			}
