@@ -1,0 +1,60 @@
+$(function () {
+  $('#<%= @container %>').highcharts({
+    chart: {
+				marginTop: 50,
+        type: 'column'
+    },
+    title: {
+        text: '<%= @title %>'
+    },
+    xAxis: {
+        categories: <%= @categories %>
+    },
+    yAxis: [{ // Primary yAxis
+            min: 0,
+            title: {
+                text: '<%= @ytitle_primary %>',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            opposite: true
+        }, { // Secondary yAxis
+            min: 0,
+            title: {
+                text: '<%= @ytitle_secondary %>',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            },
+					  stackLabels: {
+					  		enabled: false,
+					  		style: {
+					  				fontWeight: 'bold',
+					  				color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+					      }
+					  }
+    }],
+    tooltip: {
+        pointFormat: '<%= @tooltip_point_format %>',
+        shared: true
+    },
+    plotOptions: {
+        column: {
+            stacking: 'normal'
+        },
+				spline: {
+        		dataLabels: {
+            		enabled: true,
+					  		style: {
+					  				fontWeight: 'bold',
+					  				color: (Highcharts.theme && Highcharts.theme.textColor) || '#64A600'
+					      }
+            },
+            enableMouseTracking: false
+       	}
+    },
+    <%= @rawdata %>
+    series: <%= @data %>
+  });
+});

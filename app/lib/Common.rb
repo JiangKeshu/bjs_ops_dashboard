@@ -50,7 +50,7 @@ def mergeHash(h,l)
   end
 end
 
-def genChartRawdataString(chartContainer, team, startDate, endDate)
+def genChartRawdataString(chartContainer, team, startDate, endDate, option)
   str_exporting = %Q[
           exporting: {
             buttons: {
@@ -63,7 +63,7 @@ def genChartRawdataString(chartContainer, team, startDate, endDate)
                 //symbolStroke: '#333333',
                 height: 50,
                 onclick: function () {
-                  window.open('/rawdata/?view=#{chartContainer}&team=#{team}&start_date=#{startDate}&end_date=#{endDate}','_blank');
+                  window.open('/rawdata/?view=#{chartContainer}&team=#{team}&option=#{option}&start_date=#{startDate}&end_date=#{endDate}','_blank');
                 },
                 theme: {
                   padding: 3,

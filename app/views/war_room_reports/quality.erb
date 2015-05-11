@@ -2,7 +2,7 @@
 <%= javascript_include_tag 'moment.min', 'daterangepicker', 'jquery.dataTables', 'bootstrap-multiselect', 'prettify' ,'highcharts', 'exporting' %>
 <ul id="tabs">
 	<li><a href="#" name="tab1" id="quality_tab1">SLA</a></li>
-	<li><a href="#" name="tab2" id="quality_tab2">TTR</a></li>
+	<li><a href="#" name="tab2" id="quality_tab2">TTC</a></li>
 </ul>
 <div id="tabs-content">
 	<div class="page" id="tab1">
@@ -95,14 +95,18 @@
 	  <!--/.pageheader -->
 		<div class="pagecontent">
 			<div class="tab-content">
-				<h2>PS case duration</h2>
-				<div id="ps_case_duration_chart"></div>
-				<h2>CS case duration</h2>
-				<div id="cs_case_duration_chart"></div>
-				<h2>PS TTR by Severity</h2>
-				<div id="ps_ttr_severity_chart"></div>
-				<h2>CS TTR by Severity</h2>
-				<div id="cs_ttr_severity_chart"></div>
+				<h2>PS case TTC(Sev 1 - 5)</h2>
+				<div id="ps_case_ttr_sev1_5_chart"></div>
+				<h2>PS case TTC(Sev 1)</h2>
+				<div id="ps_case_ttr_sev1_chart"></div>
+				<h2>PS case TTC(Sev 2 - 4)</h2>
+				<div id="ps_case_ttr_sev2_4_chart"></div>
+				<h2>CS case TTC(Sev 1 - 5)</h2>
+				<div id="cs_case_ttr_sev1_5_chart"></div>
+				<h2>CS case TTC(Sev 1)</h2>
+				<div id="cs_case_ttr_sev1_chart"></div>
+				<h2>CS case TTC(Sev 2 - 4)</h2>
+				<div id="cs_case_ttr_sev2_4_chart"></div>
 			</div>
 			<!--/.tab-content-->
 		</div>
@@ -181,20 +185,22 @@
 			//gen_ttr_severity_chart("CS");
 		}
 		function gen_ttr_report(){
-			gen_case_duration_chart("PS");
-			gen_case_duration_chart("CS");
-			gen_ttr_severity_chart("PS");
-			gen_ttr_severity_chart("CS");
+			gen_case_duration_chart("PS", "ps_case_ttr_sev1_5_chart", new Array([1,2,3,4,5]));
+			gen_case_duration_chart("CS", "cs_case_ttr_sev1_5_chart", new Array([1,2,3,4,5]));
+			gen_case_duration_chart("PS", "ps_case_ttr_sev1_chart", new Array([1]));
+			gen_case_duration_chart("CS", "cs_case_ttr_sev1_chart", new Array([1]));
+			gen_case_duration_chart("PS", "ps_case_ttr_sev2_4_chart", new Array([2,3,4]));
+			gen_case_duration_chart("CS", "cs_case_ttr_sev2_4_chart", new Array([2,3,4]));
 		}
 		
-		function gen_case_duration_chart(team){		
+		function gen_case_duration_chart(team, container, severity){		
 			/*
 			var users = $('#ms_user').val();
 			if (users[0] == "multiselect-all") {
 				users.shift();
 			}
 			*/
-			$.post("/war_room_reports/get_case_duration", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team":team, "container": team.toLowerCase() + "_case_duration_chart"}, function(data, status) {
+			$.post("/war_room_reports/get_case_duration", {"start_date": start_date.format("yyyyMMdd"), "end_date": end_date.format("yyyyMMdd"), "team":team, "container": container, "severity": severity}, function(data, status) {
 			eval(data);
 			});
 		}

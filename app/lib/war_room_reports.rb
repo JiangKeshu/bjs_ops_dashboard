@@ -224,7 +224,7 @@ def getOpeningCases(team, chartContainer)
 		count = count + 1
 	end
 
-	str_exporting = genChartRawdataString(chartContainer, team, '', '')
+	str_exporting = genChartRawdataString(chartContainer, team, '', '', '')
 	assigns[:data] = lData.to_json
 	assigns[:container] = team.downcase+"_"+chartContainer
 	assigns[:title] = "#{team}"
@@ -298,26 +298,44 @@ def getCaseSLAChart(team, startDate, endDate, container, granu)
 		data << hashTmp
 	end
 	puts "getCaseSLAChart: container=" + container + " , team=" + team
-  assigns[:rawdata] = genChartRawdataString(container, team, startDate, endDate)
+  assigns[:rawdata] = genChartRawdataString(container, team, startDate, endDate, '')
 	assigns[:data] = data.to_json
 	assigns[:categories] = categories.to_json	
 	assigns[:container] = team.downcase + "_" + container	
 	assigns
 end
 
-def getCaseDurationChart(team, startDate, endDate, container, granu)
+def getCaseDurationChart(team, startDate, endDate, container, severity, granu)
 	assigns = {}
 	categories = getCategories(startDate, endDate)
 	sequel = DBConf.new
-	ds = sequel.getCaseDurationDS(team, startDate, endDate, granu)
+	ds = sequel.getCaseDurationDS(team, startDate, endDate, severity, granu)
+	dsAvgTTC = sequel.getAvgTTCDS(team, startDate, endDate, severity, granu)
 	listDS = parseDSToList(ds)
+	listDSAvgTTC = parseDSToList(dsAvgTTC)
+	sequel.close()
 	hashResult = {}
+	hashResultAvgTTC = {} 
+	listSpline = []
 	listDS.each do |d|
 		h = parseListToHash(d)
 		mergeHash(hashResult, h)
 	end
-	sequel.close()
+	listDSAvgTTC.each do |d|
+		value = d[0].to_i
+		key = d[1].to_s
+		hashResultAvgTTC[key] = value
+	end
+	categories.each do |c|
+		listSpline << hashResultAvgTTC[c]
+	end
 	data = []
+	hashTmp = {}
+	hashTmp["name"] = 'avg_ttc'
+	hashTmp["data"] = listSpline
+	hashTmp["type"] = 'spline'
+	hashTmp["zIndex"] = 99	
+	data << hashTmp
 	hashResult.each do |k,v|
 		hashTmp = {}
 		hashTmp["name"] = k
@@ -330,11 +348,17 @@ def getCaseDurationChart(team, startDate, endDate, container, granu)
 			end
 		end
 		hashTmp["data"] = listValue
+		hashTmp["type"] = 'column'
+		hashTmp["yAxis"] = 1
 		data << hashTmp
 	end
 	assigns[:data] = data.to_json
 	assigns[:categories] = categories.to_json	
 	assigns[:container] = container	
+	assigns[:ytitle_primary] = 'Average TTC (day/s)'
+	assigns[:ytitle_secondary] = 'Resolved Case Volume'
+	assigns[:tooltip_point_format] = '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b>({point.percentage:.0f}%)<br/>'
+  assigns[:rawdata] = genChartRawdataString('case_ttr', team, startDate, endDate, severity.join(','))
 	assigns
 end
 

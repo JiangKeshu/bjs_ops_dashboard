@@ -16,7 +16,7 @@ class DBConf
 
 	def getEngineers(listSupervisor, role)
 		hashEngineer = {} 
-		hashRole = { "cs" => "TCSA%AWS", "ps" => "Cloud Support Engineer"}
+		hashRole = { "cs" => "TCSA%AWS", "ps" => "Cloud Support%"}
 		title = hashRole[role]
 		listSupervisor.each { |supervisor|
 			listEngineer = []
@@ -38,7 +38,7 @@ class DBConf
 
 	def getAgentInfo(login)
 		result = {}
-		hashRole = { "TCSA Â¿ AWS" => "TCSA", "Cloud Support Engineer" => "CSE"}
+		hashRole = { "TCSA Â¿ AWS" => "TCSA", "Cloud Support Engineer" => "CSE", "TCSA - AWS" => "TCSA", "Cloud Support Associate Intern" => "CSA Intern"}
 		ds = @DB.fetch("select agent_login_id, supervisor_login_name, title, amzn_hire_date from agents_cn where agent_login_id = '#{login}'")
 		ds.each { |r| 
 			result['Login'] = r[:agent_login_id]
@@ -55,7 +55,7 @@ class DBConf
 		result = 0
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 		#sql="select count(*) ct from o_communications_cn where owner_agent_login='#{login}' and date_add(CREATION_DATE, interval 8 hour)>='#{startDate}' and date_add(CREATION_DATE, interval 8 hour) < '#{endDate}' and COMM_TYPE_CODE='E'"
-		sql="select count(o.comm_id) ct from o_communications_cn o, o_case_communications_cn c,d_case_details_cn d where c.comm_id = o.comm_id and c.case_id = d.case_id and owner_agent_login='#{login}' and d.primary_email_id not like 'aws%support%@amazon.com' and date_add(c.CREATION_DATE, interval 8 hour)>=str_to_date('#{startDate}','%Y%m%d') and date_add(c.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and COMM_TYPE_CODE='E' and o.IS_AMAZON_SENDER='Y'"
+		sql="select count(o.comm_id) ct from o_communications_cn o, o_case_communications_cn c,d_case_details_cn d where c.comm_id = o.comm_id and c.case_id = d.case_id and owner_agent_login='#{login}' and d.primary_email_id not like 'aws%@amazon.com' and date_add(c.CREATION_DATE, interval 8 hour)>=str_to_date('#{startDate}','%Y%m%d') and date_add(c.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and COMM_TYPE_CODE='E' and o.IS_AMAZON_SENDER='Y'"
 		ds = @DB.fetch(sql)
 		ds.each { |r|
 			result = r[:ct]
@@ -68,7 +68,7 @@ class DBConf
 		result = 0
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 		#sql = "select count(distinct(c.case_id)) ct from o_communications_cn o,o_case_communications_cn c where o.comm_id = c.comm_id and o.owner_agent_login='#{login}' and date_add(o.CREATION_DATE, interval 8 hour)>='#{startDate}' and date_add(o.CREATION_DATE, interval 8 hour) < '#{endDate}' and COMM_TYPE_CODE='E'"
-		sql = "select count(distinct(c.case_id)) ct from o_communications_cn o,o_case_communications_cn c,d_case_details_cn d where o.comm_id = c.comm_id and d.case_id=c.case_id and o.owner_agent_login='#{login}' and d.primary_email_id not like 'aws%support%@amazon.com' and date_add(o.CREATION_DATE, interval 8 hour)>='#{startDate}' and date_add(o.CREATION_DATE, interval 8 hour) < '#{endDate}' and COMM_TYPE_CODE='E'"
+		sql = "select count(distinct(c.case_id)) ct from o_communications_cn o,o_case_communications_cn c,d_case_details_cn d where o.comm_id = c.comm_id and d.case_id=c.case_id and o.owner_agent_login='#{login}' and d.primary_email_id not like 'aws%@amazon.com' and date_add(o.CREATION_DATE, interval 8 hour)>='#{startDate}' and date_add(o.CREATION_DATE, interval 8 hour) < '#{endDate}' and COMM_TYPE_CODE='E'"
 		ds = @DB.fetch(sql)
 		ds.each {|r|
 			result = r[:ct]
@@ -105,8 +105,8 @@ class DBConf
 	def getWeeklyCRSPByQueue(type, startDate, endDate)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 		sql = {};
-		sql["PS"] = "select EMAIL_QUEUE_NAME queue_name, CONCAT(YEAR(date_add(m.CREATION_DATE, interval 8 hour)), '/', WEEK(date_add(m.CREATION_DATE, interval 8 hour),5)+1,'w')  week_name, count(m.comm_id) ct from d_case_details_cn c, o_case_communications_cn m,o_communications_cn t where c.case_id = m.case_id and m.comm_id=t.comm_id and date_add(m.CREATION_DATE, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(m.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and t.IS_AMAZON_SENDER='Y' and c.email_queue_name not like 'acme-aws-cs%' and c.primary_email_id not like ('aws%support%@amazon.com') group by week_name,c.EMAIL_QUEUE_NAME"
-		sql["CS"] = "select EMAIL_QUEUE_NAME queue_name, CONCAT(YEAR(date_add(m.CREATION_DATE, interval 8 hour)), '/', WEEK(date_add(m.CREATION_DATE, interval 8 hour),5)+1,'w')  week_name, count(m.comm_id) ct from d_case_details_cn c, o_case_communications_cn m,o_communications_cn t where c.case_id = m.case_id and m.comm_id=t.comm_id and date_add(m.CREATION_DATE, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(m.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and t.IS_AMAZON_SENDER='Y' and c.email_queue_name like 'acme-aws-cs%' and c.primary_email_id not like 'aws%support%@amazon.com' group by week_name,c.EMAIL_QUEUE_NAME"
+		sql["PS"] = "select EMAIL_QUEUE_NAME queue_name, CONCAT(YEAR(date_add(m.CREATION_DATE, interval 8 hour)), '/', WEEK(date_add(m.CREATION_DATE, interval 8 hour),5)+1,'w')  week_name, count(m.comm_id) ct from d_case_details_cn c, o_case_communications_cn m,o_communications_cn t where c.case_id = m.case_id and m.comm_id=t.comm_id and date_add(m.CREATION_DATE, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(m.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and t.IS_AMAZON_SENDER='Y' and c.email_queue_name not like 'acme-aws-cs%' and c.primary_email_id not like ('aws%@amazon.com') group by week_name,c.EMAIL_QUEUE_NAME"
+		sql["CS"] = "select EMAIL_QUEUE_NAME queue_name, CONCAT(YEAR(date_add(m.CREATION_DATE, interval 8 hour)), '/', WEEK(date_add(m.CREATION_DATE, interval 8 hour),5)+1,'w')  week_name, count(m.comm_id) ct from d_case_details_cn c, o_case_communications_cn m,o_communications_cn t where c.case_id = m.case_id and m.comm_id=t.comm_id and date_add(m.CREATION_DATE, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(m.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and t.IS_AMAZON_SENDER='Y' and c.email_queue_name like 'acme-aws-cs%' and c.primary_email_id not like 'aws%@amazon.com' group by week_name,c.EMAIL_QUEUE_NAME"
 		ds = @DB.fetch(sql[type])
 
 		ds
@@ -114,7 +114,7 @@ class DBConf
 
 	def getWeeklyCRSPByType(startDate, endDate)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
-		sql = "select CONCAT(YEAR(date_add(m.CREATION_DATE, interval 8 hour)), '/', WEEK(date_add(m.CREATION_DATE, interval 8 hour),5)+1,'w')  week_name,t.type, count(m.comm_id) ct from d_case_details_cn c, o_case_communications_cn m, o_communications_cn comm, t_acme_case_queue_type t where c.case_id = m.case_id and m.comm_id = comm.comm_id and comm.is_amazon_sender='Y' and date_add(m.CREATION_DATE, interval 9 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(m.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and c.primary_email_id not like ('aws%support%@amazon.com') and c.email_queue_name = t.acme_case_queue_name group by type,week_name;"		
+		sql = "select CONCAT(YEAR(date_add(m.CREATION_DATE, interval 8 hour)), '/', WEEK(date_add(m.CREATION_DATE, interval 8 hour),5)+1,'w')  week_name,t.type, count(m.comm_id) ct from d_case_details_cn c, o_case_communications_cn m, o_communications_cn comm, t_acme_case_queue_type t where c.case_id = m.case_id and m.comm_id = comm.comm_id and comm.is_amazon_sender='Y' and date_add(m.CREATION_DATE, interval 9 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(m.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and c.primary_email_id not like ('aws%@amazon.com') and c.email_queue_name = t.acme_case_queue_name group by type,week_name;"		
 		ds = @DB.fetch(sql)
 
 		ds
@@ -122,7 +122,7 @@ class DBConf
 
 	def getWeeklyCasesByStatus(team, startDate, endDate)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
-    sql = "select CONCAT(YEAR(date_add(CASE_START_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CASE_START_DATE_UTC, interval 8 hour),5)+1,'w')  week_name, CASE_STATUS_NAME status, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by week_name,status"
+    sql = "select CONCAT(YEAR(date_add(CASE_START_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CASE_START_DATE_UTC, interval 8 hour),5)+1,'w')  week_name, CASE_STATUS_NAME status, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by week_name,status"
 		puts sql
 		ds = @DB.fetch(sql)
 
@@ -131,7 +131,7 @@ class DBConf
 
 	def getWeeklyCasesBySeverity(team, startDate, endDate)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
-    sql = "select CONCAT(YEAR(date_add(CASE_START_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CASE_START_DATE_UTC, interval 8 hour),5)+1,'w')  week_name, severity, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by week_name,severity"
+    sql = "select CONCAT(YEAR(date_add(CASE_START_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CASE_START_DATE_UTC, interval 8 hour),5)+1,'w')  week_name, severity, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by week_name,severity"
 		ds = @DB.fetch(sql)
 		ds
 	end
@@ -139,7 +139,7 @@ class DBConf
 	def getCreatedCaseCount(team, startDate, endDate, granu)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 		granuText = getGranuText(granu, "CASE_START_DATE_UTC")
-		sql = "select #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by period"
+		sql = "select #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by period"
 		ds = @DB.fetch(sql)
 
 		ds
@@ -148,7 +148,7 @@ class DBConf
 	def getClosedCaseCount(team, startDate, endDate, granu)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 		granuText = getGranuText(granu, "CASE_RESOLVE_DATE_UTC")
-		sql = "select #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_RESOLVE_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_RESOLVE_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by period"
+		sql = "select #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(CASE_RESOLVE_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_RESOLVE_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by period"
 		ds = @DB.fetch(sql)
 
 		ds
@@ -157,44 +157,56 @@ class DBConf
 	def getCorrespondenceCount(team, startDate, endDate, granu)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 		granuText = getGranuText(granu, "o.CREATION_DATE")
-		titleMapping = {"PS" => "Cloud Support Engineer", "CS" => "TCSA%"}
+		titleMapping = {"PS" => "Cloud Support%", "CS" => "TCSA%"}
 		title = titleMapping[team]
 		#sql = "select #{granuText} period,count(*) ct from o_communications_cn where owner_agent_login in (select agent_login_id from agents_cn where title like '#{title}') and date_add(CREATION_DATE, interval 8 hour)>=str_to_date('#{startDate}','%Y%m%d') and date_add(CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and COMM_TYPE_CODE='E' group by period"
-		sql = "select #{granuText} period,count(o.comm_id) ct from o_communications_cn o,o_case_communications_cn c,d_case_details_cn d where d.case_id=c.case_id and c.comm_id = o.comm_id and owner_agent_login in (select agent_login_id from agents_cn where title like '#{title}') and d.primary_email_id not like 'aws%support%@amazon.com' and date_add(o.CREATION_DATE, interval 8 hour)>=str_to_date('#{startDate}','%Y%m%d') and date_add(o.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and COMM_TYPE_CODE in ('E','C') and is_amazon_sender='Y' group by period"
+		sql = "select #{granuText} period,count(o.comm_id) ct from o_communications_cn o,o_case_communications_cn c,d_case_details_cn d where d.case_id=c.case_id and c.comm_id = o.comm_id and owner_agent_login in (select agent_login_id from agents_cn where title like '#{title}') and d.primary_email_id not like 'aws%@amazon.com' and date_add(o.CREATION_DATE, interval 8 hour)>=str_to_date('#{startDate}','%Y%m%d') and date_add(o.CREATION_DATE, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and COMM_TYPE_CODE in ('E','C') and is_amazon_sender='Y' group by period"
 		ds = @DB.fetch(sql)
 		ds
 	end
 
 	def getOpeningCasesDS(team)
-		sql = "select case_status_name,count(case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and case_status_name <> 'Resolved' group by case_status_name;"
+		sql = "select case_status_name,count(case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and case_status_name <> 'Resolved' group by case_status_name;"
 		ds = @DB.fetch(sql)
 		ds
 	end
 
 	def getOpeningCasesDrilldownDS(team)
-		sql = "select case_status_name,email_queue_name,count(case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and case_status_name <> 'Resolved' group by case_status_name, email_queue_name;"
+		sql = "select case_status_name,email_queue_name,count(case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and case_status_name <> 'Resolved' group by case_status_name, email_queue_name;"
 		ds = @DB.fetch(sql)
 		ds
 	end
 
-	def getCaseDurationDS(team, startDate, endDate, granu)
+	def getCaseDurationDS(team, startDate, endDate, severity, granu)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
-		granuText = getGranuText(granu, "CASE_START_DATE_UTC")
+		granuText = getGranuText(granu, "case_resolve_date_utc")
 		titleMapping = {"PS" => "Cloud Support Engineer", "CS" => "TCSA%"}
+		strSeverity = severity.join(',')
 		title = titleMapping[team]
-		sql = "select CASE when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) >=0 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=24 then 'less than 1 day' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 24 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=48 then '1 ~ 2 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 48 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=96  then '2 ~ 4 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) is null then 'opening' else 'more than 4 days' END duration, #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by duration, period;"
-		puts sql
+		sql = "select CASE when timestampdiff(hour,CREATION_DATE_UTC,case_resolve_date_utc) >=0 and timestampdiff(hour,CREATION_DATE_UTC,case_resolve_date_utc) <=168 then '1 ~ 7 days' when timestampdiff(hour,CREATION_DATE_UTC,case_resolve_date_utc) > 168 and timestampdiff(hour,CREATION_DATE_UTC,case_resolve_date_utc) <=336 then '7 ~ 14 days' when timestampdiff(hour,CREATION_DATE_UTC,case_resolve_date_utc) > 336 then 'more than 14 days' END duration, #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(case_resolve_date_utc, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(case_resolve_date_utc, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and case_status_name='resolved' and severity in (#{strSeverity}) group by duration, period;"
 		ds = @DB.fetch(sql)
 
+		ds
+	end
+
+	def getAvgTTCDS(team, startDate, endDate, severity, granu)
+		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
+		granuText = getGranuText(granu, "case_resolve_date_utc")
+		titleMapping = {"PS" => "Cloud Support Engineer", "CS" => "TCSA%"}
+		strSeverity = severity.join(',')
+		title = titleMapping[team]
+		sql = "select ceil(avg(timestampdiff(day,CREATION_DATE_UTC,case_resolve_date_utc))) avg_ttc, #{granuText} period from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(case_resolve_date_utc, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(case_resolve_date_utc, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') and case_status_name='resolved' and severity in (#{strSeverity}) group by period;"
+		ds = @DB.fetch(sql)
+		puts sql
 		ds
 	end
 
 	def getTTRSeverityDS(team, startDate, endDate, granu)
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
-		granuText = getGranuText(granu, "CASE_START_DATE_UTC")
+		granuText = getGranuText(granu, "case_resolve_date_utc")
 		titleMapping = {"PS" => "Cloud Support Engineer", "CS" => "TCSA%"}
 		title = titleMapping[team]
-		sql = "select CASE when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) >=0 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=24 then 'less than 1 day' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 24 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=48 then '1 ~ 2 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 48 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=96  then '2 ~ 4 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) is null then 'opening' else 'more than 4 days' END duration,severity, #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by duration,severity, period;"
+		sql = "select CASE when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) >=0 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=24 then 'less than 1 day' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 24 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=48 then '1 ~ 2 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 48 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=96  then '2 ~ 4 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) is null then 'opening' else 'more than 4 days' END duration,severity, #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(case_resolve_date_utc, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(case_resolve_date_utc, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by duration,severity, period;"
 		puts sql
 		ds = @DB.fetch(sql)
 
@@ -206,8 +218,8 @@ class DBConf
 		granuText = getGranuText(granu, "CASE_START_DATE_UTC")
 		titleMapping = {"PS" => "Cloud Support Engineer", "CS" => "TCSA%"}
 		title = titleMapping[team]
-		#sql = "select CASE when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) >=0 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=24 then 'less than 1 day' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 24 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=48 then '1 ~ 2 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 48 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=96  then '2 ~ 4 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) is null then 'opening' else 'more than 4 days' END duration, #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by duration, period;"
-		sql = "select (CASE when (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,FIRST_OUTBOUND_DATE_UTC) - sla <= 0) or (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,case_resolve_date_utc) - sla <= 0 and first_outbound_date_utc is null) THEN 'meet' ELSE 'fail' END) case_sla, #{granuText} period, count(case_id) ct from d_case_details_cn c, t_acme_case_queue_type t, t_case_sla s where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and s.severity = c.severity and c.primary_email_id not like 'aws%support%@amazon.com' and primary_email_id not like 'feliwang%@amazon.com' and primary_email_id <>'jiannian@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by case_sla,period;"
+		#sql = "select CASE when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) >=0 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=24 then 'less than 1 day' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 24 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=48 then '1 ~ 2 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) > 48 and timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) <=96  then '2 ~ 4 days' when timestampdiff(hour,case_start_date_utc,case_resolve_date_utc) is null then 'opening' else 'more than 4 days' END duration, #{granuText} period, count(c.case_id) ct from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by duration, period;"
+		sql = "select (CASE when (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,FIRST_OUTBOUND_DATE_UTC) - sla <= 0) or (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,case_resolve_date_utc) - sla <= 0 and first_outbound_date_utc is null) THEN 'meet' ELSE 'fail' END) case_sla, #{granuText} period, count(case_id) ct from d_case_details_cn c, t_acme_case_queue_type t, t_case_sla s where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and s.severity = c.severity and c.primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'feliwang%@amazon.com' and primary_email_id <>'jiannian@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{startDate}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{endDate}','%Y%m%d') group by case_sla,period;"
 		puts sql
 		ds = @DB.fetch(sql)
 
@@ -297,13 +309,15 @@ class DBConf
 		start_date = params[:start_date]
 		end_date = params[:end_date]
 		team = params[:team]
+		option = params[:option]
 		sql_map = { 
-			"week_cases_by_status" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1,'w') period, CASE_STATUS_NAME status, c.case_id  from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and date_add(CREATION_DATE_UTC, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(CREATION_DATE_UTC, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') order by 1 desc;",
-			"opening_cases" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1,'w') period,case_status_name status,case_id from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%support%@amazon.com' and case_status_name <> 'Resolved';",
-			"case_sla_chart" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1,'w') period, (CASE when (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,FIRST_OUTBOUND_DATE_UTC) - sla <= 0) or (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,case_resolve_date_utc) - sla <= 0 and first_outbound_date_utc is null) THEN 'meet' ELSE 'fail' END) case_sla, case_id from d_case_details_cn c, t_acme_case_queue_type t, t_case_sla s where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and s.severity = c.severity and c.primary_email_id not like 'aws%support%@amazon.com' and primary_email_id not like 'feliwang%@amazon.com' and primary_email_id <>'jiannian@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') having case_sla='fail';"
+			"week_cases_by_status" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', lpad(WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1, 2, '0'),'w') period, CASE_STATUS_NAME status, c.case_id  from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(CREATION_DATE_UTC, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(CREATION_DATE_UTC, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') order by 1 desc;",
+			"opening_cases" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', lpad(WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1, 2, '0'),'w') period,case_status_name status,case_id from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and case_status_name <> 'Resolved';",
+			"case_sla_chart" => "select CONCAT(YEAR(date_add(CREATION_DATE_UTC, interval 8 hour)), '/', lpad(WEEK(date_add(CREATION_DATE_UTC, interval 8 hour),5)+1, 2, '0'),'w') period, (CASE when (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,FIRST_OUTBOUND_DATE_UTC) - sla <= 0) or (TIMESTAMPDIFF(MINUTE,CREATION_DATE_UTC,case_resolve_date_utc) - sla <= 0 and first_outbound_date_utc is null) THEN 'meet' ELSE 'fail' END) case_sla, case_id from d_case_details_cn c, t_acme_case_queue_type t, t_case_sla s where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and s.severity = c.severity and c.primary_email_id not like 'aws%@amazon.com' and primary_email_id not like 'feliwang%@amazon.com' and primary_email_id <>'jiannian@amazon.com' and date_add(CASE_START_DATE_UTC, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(CASE_START_DATE_UTC, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') having case_sla='fail';",
+			"case_ttr" => "select CONCAT(YEAR(date_add(case_resolve_date_utc, interval 8 hour)), '/', lpad(WEEK(date_add(case_resolve_date_utc, interval 8 hour),5)+1, 2, '0'),'w') period, case_id, severity, ceil(timestampdiff(day,CREATION_DATE_UTC,case_resolve_date_utc)) case_ttr from d_case_details_cn c, t_acme_case_queue_type t where c.email_queue_name=t.acme_case_queue_name and t.team='#{team}' and c.primary_email_id not like 'aws%@amazon.com' and date_add(case_resolve_date_utc, interval 8 hour) >= str_to_date('#{start_date}','%Y%m%d') and date_add(case_resolve_date_utc, interval 8 hour) < str_to_date('#{end_date}','%Y%m%d') and case_status_name='resolved' and severity in (#{option});"
 		}
 		sql = sql_map[params[:view]]
-		pp sql
+		puts sql
 		ds = @DB.fetch(sql)
 
 		ds
