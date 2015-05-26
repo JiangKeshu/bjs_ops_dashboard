@@ -88,11 +88,11 @@ BjsOpsDashboard::App.controllers :war_room_reports do
 		endDate = params[:end_date]
 		team = params[:team]
 		container = params[:container]
-		assigns = getCaseDurationChart(team, startDate, endDate, container, "week")
-		template = File.new(TEMPLATE_PATH + "stacked_column.erb").read
-
+		severity = params[:severity]['0']
+		assigns = getCaseDurationChart(team, startDate, endDate, container, severity, "week")
+		template = File.new(TEMPLATE_PATH + "stacked_column_spline.erb").read
 		strJS = template.eruby(assigns)
-		strJS		
+		strJS
 	end
 
 	post "/get_case_sla" do
@@ -104,7 +104,6 @@ BjsOpsDashboard::App.controllers :war_room_reports do
 		template = File.new(TEMPLATE_PATH + "stacked_column.erb").read
 
 		strJS = template.eruby(assigns)
-		puts strJS
 		strJS		
 	end
 
@@ -117,7 +116,6 @@ BjsOpsDashboard::App.controllers :war_room_reports do
 		template = File.new(TEMPLATE_PATH + "stacked_grouped_column.erb").read
 
 		strJS = template.eruby(assigns)
-		puts strJS
 		strJS		
 	end
 

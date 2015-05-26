@@ -22,6 +22,7 @@
 	var team = getURLParameter("team");
 	var start_date = getURLParameter("start_date");
 	var end_date = getURLParameter("end_date");
+	var option = getURLParameter("option");
 	$(document).ready(function() {
 		function gen_report(){
 			var table = '';
@@ -33,7 +34,7 @@
         "ajax": {
           "url" : "/rawdata/show_rawdata",
           "type" : "POST",
-          "data" : { "view": view, "start_date" : start_date, "end_date" : end_date, "team" : team }
+          "data" : { "view": view, "start_date" : start_date, "end_date" : end_date, "team" : team , "option" : option}
         },
         "order" : [[0,"desc"],[1,"desc"]],
         "aoColumns" : <%= @rawdata_datatable_json.html_safe %>
