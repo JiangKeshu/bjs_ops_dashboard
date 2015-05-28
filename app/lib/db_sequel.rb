@@ -96,13 +96,13 @@ class DBConf
 		result = {}
 		endDate = (DateTime.parse(endDate, "%Y%m%d") + 1).strftime("%Y%m%d").to_s
 
-		sql = "select count(distinct(tt_id)) tt_count from tickets where tt_ower='#{login}' and date_add(create_datetime, interval 8 hour)>='#{startDate}' and date_add(create_datetime, interval 8 hour)<'#{endDate}'"
+		sql = "select count(distinct(tt_id)) tt_count from tickets where tt_ower='#{login}' and date_add(create_datetime, interval 8 hour)>='#{startDate}' and date_add(create_datetime, interval 8 hour)<'#{endDate}' and length(tt_tags)>0"
 		ds = @TTDB.fetch(sql)
 		ds.each { |r|
 			result["tt_count"] = r[:tt_count]
 		}
 
-		sql = "select count(distinct(c_id)) tt_correspondences from correspondences where c_ower='#{login}' and date_add(create_datetime, interval 8 hour)>='#{startDate}' and date_add(create_datetime, interval 8 hour)<'#{endDate}'"
+		sql = "select count(c.c_id) tt_correspondences from correspondences as c inner join tickets as t on c.tt_id=t.tt_id where c_ower='#{login}' and length(t.tt_tags)>0 and date_add(c.create_datetime, interval 8 hour)>='#{startDate}' and date_add(c.create_datetime, interval 8 hour)<'#{endDate}'"
 		ds = @TTDB.fetch(sql)
 		ds.each { |r|
 			result["tt_correspondences"] = r[:tt_correspondences]
